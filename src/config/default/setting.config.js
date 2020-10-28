@@ -18,9 +18,9 @@ const setting = {
       ? 'vab-mock-server'
       : 'vab-mock-server',
   //标题 （包括初次加载雪花屏的标题 页面的标题 浏览器的标题）
-  title: 'vue-admin-beautiful',
+  title: 'cosmos',
   //简写
-  abbreviation: 'vab',
+  abbreviation: 'cs',
   //开发环境端口号
   devPort: '80',
   //版本号
@@ -42,7 +42,7 @@ const setting = {
   //token名称
   tokenName: 'accessToken',
   //token在localStorage、sessionStorage存储的key的名称
-  tokenTableName: 'vue-admin-beautiful',
+  tokenTableName: 'cosmos-token',
   //token存储位置localStorage sessionStorage
   storage: 'localStorage',
   //token失效回退到登录页时是否记录本次的路由

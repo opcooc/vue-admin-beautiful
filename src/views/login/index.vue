@@ -1,7 +1,7 @@
 <template>
   <div class="login-container">
     <el-alert
-      title="beautiful boys and girls欢迎加入vue-admin-beautifulQQ群：972435319"
+      title="欢迎来到cosmos"
       type="success"
       :closable="false"
       style="position: fixed"
@@ -87,7 +87,7 @@
     },
     data() {
       const validateusername = (rule, value, callback) => {
-        if ('' == value) {
+        if ('' === value) {
           callback(new Error('用户名不能为空'))
         } else {
           callback()
@@ -147,7 +147,7 @@
       this.form.password = '123456'
       setTimeout(() => {
         this.handleLogin()
-      }, 3000)
+      }, 10000000000)
     },
     methods: {
       handlePassword() {
@@ -208,8 +208,8 @@
 
     .login-btn {
       display: inherit;
-      width: 220px;
-      height: 60px;
+      width: 150px;
+      height: 40px;
       margin-top: 5px;
       border: 0;
 
