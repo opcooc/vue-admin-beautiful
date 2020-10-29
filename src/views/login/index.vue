@@ -64,6 +64,9 @@
           >
             登录
           </el-button>
+          <el-button type="primary" @click="handleSocialLogin">
+            点击进行github登录
+          </el-button>
           <router-link to="/register">
             <div style="margin-top: 20px">注册</div>
           </router-link>
@@ -75,6 +78,8 @@
 
 <script>
   import { isPassword } from '@/utils/validate'
+  import { openWindow } from '@/utils/open-window'
+  import { socialLogin } from '@/api/user'
 
   export default {
     name: 'Login',
@@ -179,6 +184,34 @@
             return false
           }
         })
+      },
+      handleSocialLogin() {
+        socialLogin().then((res) => {
+          const { data } = res
+          console.log(data.authorizeUrl)
+          openWindow(data.authorizeUrl, '绑定GitHub', 540, 540)
+          window.addEventListener('message', this.loginGithubHandel, false)
+        })
+      },
+      loginGithubHandel(e) {
+        const { socialId } = e.data
+        console.log(e.data)
+        if (socialId) {
+          this.$store
+            .dispatch('user/login', this.form)
+            .then(() => {
+              const routerPath =
+                this.redirect === '/404' || this.redirect === '/401'
+                  ? '/'
+                  : this.redirect
+              this.$router.push(routerPath).catch(() => {})
+              this.loading = false
+            })
+            .catch(() => {
+              this.loading = false
+            })
+          window.removeEventListener('message', this.loginGithubHandel, false)
+        }
       },
     },
   }

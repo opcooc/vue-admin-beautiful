@@ -21,6 +21,17 @@ module.exports = [
     },
   },
   {
+    url: '/socialLogin',
+    type: 'post',
+    response(config) {
+      return {
+        code: 200,
+        msg: 'success',
+        data: { authorizeUrl: 'http://www.baidu.com' },
+      }
+    },
+  },
+  {
     url: '/login',
     type: 'post',
     response(config) {

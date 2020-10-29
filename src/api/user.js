@@ -13,6 +13,13 @@ export async function login(data) {
   })
 }
 
+export async function socialLogin() {
+  return request({
+    url: '/socialLogin',
+    method: 'post',
+  })
+}
+
 export function getUserInfo(accessToken) {
   return request({
     url: '/userInfo',

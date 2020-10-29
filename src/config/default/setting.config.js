@@ -22,7 +22,7 @@ const setting = {
   //简写
   abbreviation: 'cs',
   //开发环境端口号
-  devPort: '80',
+  devPort: '8899',
   //版本号
   version: process.env.VUE_APP_VERSION,
   //烦请保留package.json作者信息 即可免费商用
@@ -36,7 +36,7 @@ const setting = {
   // 路由模式，可选值为 history 或 hash
   routerMode: 'hash',
   //不经过token校验的路由
-  routesWhiteList: ['/login', '/register', '/404', '/401'],
+  routesWhiteList: ['/login', '/socialLogin', '/register', '/404', '/401'],
   //加载时显示文字
   loadingText: '正在加载中...',
   //token名称
