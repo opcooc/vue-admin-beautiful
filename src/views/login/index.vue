@@ -65,7 +65,7 @@
             登录
           </el-button>
           <el-button type="primary" @click="handleSocialLogin">
-            点击进行github登录
+            点击进行qq登录
           </el-button>
           <router-link to="/register">
             <div style="margin-top: 20px">注册</div>
@@ -79,6 +79,7 @@
 <script>
   import { isPassword } from '@/utils/validate'
   import { openWindow } from '@/utils/open-window'
+  import { baseURL } from '@/config/settings'
   import { socialLogin } from '@/api/user'
 
   export default {
@@ -186,17 +187,15 @@
         })
       },
       handleSocialLogin() {
-        socialLogin().then((res) => {
-          const { data } = res
-          console.log(data.authorizeUrl)
-          openWindow(data.authorizeUrl, '绑定GitHub', 540, 540)
-          window.addEventListener('message', this.loginGithubHandel, false)
-        })
+        console.log(baseURL + '/auth2/authorization/qq')
+        openWindow(baseURL + '/auth2/authorization/qq', '绑定QQ', 540, 540)
+        window.addEventListener('message', this.loginGithubHandel, false)
       },
       loginGithubHandel(e) {
-        const { socialId } = e.data
+        const socialId = e.data
         console.log(e.data)
         if (socialId) {
+          console.log(111)
           this.$store
             .dispatch('user/login', this.form)
             .then(() => {
@@ -210,6 +209,7 @@
             .catch(() => {
               this.loading = false
             })
+          console.log(222)
           window.removeEventListener('message', this.loginGithubHandel, false)
         }
       },

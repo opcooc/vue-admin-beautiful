@@ -15,8 +15,8 @@ export async function login(data) {
 
 export async function socialLogin() {
   return request({
-    url: '/socialLogin',
-    method: 'post',
+    url: '/auth2/authorization/qq',
+    method: 'get',
   })
 }
 
