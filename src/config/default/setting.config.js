@@ -18,7 +18,7 @@ const setting = {
       ? 'http://127.0.0.1:7500/admin'
       : 'http://127.0.0.1:7500/admin',
   //标题 （包括初次加载雪花屏的标题 页面的标题 浏览器的标题）
-  title: 'cosmos',
+  title: 'opcooc',
   //简写
   abbreviation: 'cs',
   //开发环境端口号
@@ -36,19 +36,13 @@ const setting = {
   // 路由模式，可选值为 history 或 hash
   routerMode: 'hash',
   //不经过token校验的路由
-  routesWhiteList: [
-    '/login',
-    '/auth2/authorization',
-    '/register',
-    '/404',
-    '/401',
-  ],
+  routesWhiteList: ['/login', '/register', '/404', '/401'],
   //加载时显示文字
   loadingText: '正在加载中...',
   //token名称
   tokenName: 'accessToken',
   //token在localStorage、sessionStorage存储的key的名称
-  tokenTableName: 'cosmos-token',
+  tokenTableName: 'opcooc-token',
   //token存储位置localStorage sessionStorage
   storage: 'localStorage',
   //token失效回退到登录页时是否记录本次的路由

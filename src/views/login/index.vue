@@ -80,7 +80,6 @@
   import { isPassword } from '@/utils/validate'
   import { openWindow } from '@/utils/open-window'
   import { baseURL } from '@/config/settings'
-  import { socialLogin } from '@/api/user'
 
   export default {
     name: 'Login',
@@ -189,15 +188,13 @@
       handleSocialLogin() {
         console.log(baseURL + '/auth2/authorization/qq')
         openWindow(baseURL + '/auth2/authorization/qq', '绑定QQ', 540, 540)
-        window.addEventListener('message', this.loginGithubHandel, false)
+        window.addEventListener('message', this.loginSocial, false)
       },
-      loginGithubHandel(e) {
-        const socialId = e.data
-        console.log(e.data)
-        if (socialId) {
-          console.log(111)
+      loginSocial(e) {
+        const socialToken = e.data
+        if (socialToken) {
           this.$store
-            .dispatch('user/login', this.form)
+            .dispatch('user/loginSocial', socialToken)
             .then(() => {
               const routerPath =
                 this.redirect === '/404' || this.redirect === '/401'
@@ -209,8 +206,9 @@
             .catch(() => {
               this.loading = false
             })
-          console.log(222)
-          window.removeEventListener('message', this.loginGithubHandel, false)
+          window.removeEventListener('message', this.loginSocial, false)
+        } else {
+          this.$baseMessage('第三方授权失败!', 'error')
         }
       },
     },

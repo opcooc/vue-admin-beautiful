@@ -68,8 +68,40 @@ const actions = {
       )
     }
   },
+  async loginSocial({ commit }, socialToken) {
+    const accessToken = socialToken
+    console.log('loginSocial' + accessToken)
+    if (accessToken) {
+      commit('setAccessToken', accessToken)
+      const hour = new Date().getHours()
+      const thisTime =
+        hour < 8
+          ? '早上好'
+          : hour <= 11
+          ? '上午好'
+          : hour <= 13
+          ? '中午好'
+          : hour < 18
+          ? '下午好'
+          : '晚上好'
+      Vue.prototype.$baseNotify(`欢迎登录${title}`, `${thisTime}！`)
+    } else {
+      Vue.prototype.$baseMessage(
+        `登录接口异常，未正确返回${socialToken}...`,
+        'error'
+      )
+    }
+  },
   async getUserInfo({ commit, state }) {
-    const { data } = await getUserInfo(state.accessToken)
+    const data = {
+      permissions: ['admin'],
+      username: 'admin',
+      'avatar|1': [
+        'https://i.gtimg.cn/club/item/face/img/2/15922_100.gif',
+        'https://i.gtimg.cn/club/item/face/img/8/15918_100.gif',
+      ],
+    }
+    // const { data } = await getUserInfo(state.accessToken)
     if (!data) {
       Vue.prototype.$baseMessage('验证失败，请重新登录...', 'error')
       return false
@@ -86,7 +118,7 @@ const actions = {
     }
   },
   async logout({ dispatch }) {
-    await logout(state.accessToken)
+    // await logout(state.accessToken)
     await dispatch('resetAccessToken')
     await resetRouter()
   },
