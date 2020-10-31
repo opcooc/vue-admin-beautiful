@@ -7,70 +7,86 @@
       style="position: fixed"
     ></el-alert>
     <el-row>
-      <el-col :xs="24" :sm="24" :md="12" :lg="16" :xl="16">
+      <el-col :xs="6" :sm="6" :md="6" :lg="6" :xl="6">
         <div style="color: transparent">占位符</div>
       </el-col>
-      <el-col :xs="24" :sm="24" :md="12" :lg="8" :xl="8">
-        <el-form
-          ref="form"
-          :model="form"
-          :rules="rules"
-          class="login-form"
-          label-position="left"
-        >
-          <div class="title">hello !</div>
-          <div class="title-tips">欢迎来到{{ title }}！</div>
-          <el-form-item style="margin-top: 40px" prop="username">
-            <span class="svg-container svg-container-admin">
-              <vab-icon :icon="['fas', 'user']" />
-            </span>
-            <el-input
-              v-model.trim="form.username"
-              v-focus
-              placeholder="请输入用户名"
-              tabindex="1"
-              type="text"
-            />
-          </el-form-item>
-          <el-form-item prop="password">
-            <span class="svg-container">
-              <vab-icon :icon="['fas', 'lock']" />
-            </span>
-            <el-input
-              :key="passwordType"
-              ref="password"
-              v-model.trim="form.password"
-              :type="passwordType"
-              tabindex="2"
-              placeholder="请输入密码"
-              @keyup.enter.native="handleLogin"
-            />
-            <span
-              v-if="passwordType === 'password'"
-              class="show-password"
-              @click="handlePassword"
-            >
-              <vab-icon :icon="['fas', 'eye-slash']"></vab-icon>
-            </span>
-            <span v-else class="show-password" @click="handlePassword">
-              <vab-icon :icon="['fas', 'eye']"></vab-icon>
-            </span>
-          </el-form-item>
-          <el-button
-            :loading="loading"
-            class="login-btn"
-            type="primary"
-            @click="handleLogin"
+      <el-col :xs="12" :sm="12" :md="12" :lg="12" :xl="12">
+        <div class="sign-container-content">
+          <el-tabs
+            v-model="activeName"
+            class="sign-flow-login-content"
+            @tab-click="handleClick"
           >
-            登录
-          </el-button>
-          <el-button type="primary" @click="handleSocialLogin">
-            点击进行qq登录
-          </el-button>
-          <router-link to="/register">
-            <div style="margin-top: 20px">注册</div>
-          </router-link>
-        </el-form>
+            <el-tab-pane label="免密码登录" name="first">
+              免密码登录
+            </el-tab-pane>
+            <el-tab-pane label="密码登录" name="second">
+              <el-form
+                ref="form"
+                :model="form"
+                :rules="rules"
+                class="login-form"
+                label-position="left"
+              >
+                <div class="title">hello !</div>
+                <div class="title-tips">欢迎来到{{ title }}！</div>
+                <el-form-item style="margin-top: 40px" prop="username">
+                  <span class="svg-container svg-container-admin">
+                    <vab-icon :icon="['fas', 'user']" />
+                  </span>
+                  <el-input
+                    v-model.trim="form.username"
+                    v-focus
+                    placeholder="请输入用户名"
+                    tabindex="1"
+                    type="text"
+                  />
+                </el-form-item>
+                <el-form-item prop="password">
+                  <span class="svg-container">
+                    <vab-icon :icon="['fas', 'lock']" />
+                  </span>
+                  <el-input
+                    :key="passwordType"
+                    ref="password"
+                    v-model.trim="form.password"
+                    :type="passwordType"
+                    tabindex="2"
+                    placeholder="请输入密码"
+                    @keyup.enter.native="handleLogin"
+                  />
+                  <span
+                    v-if="passwordType === 'password'"
+                    class="show-password"
+                    @click="handlePassword"
+                  >
+                    <vab-icon :icon="['fas', 'eye-slash']"></vab-icon>
+                  </span>
+                  <span v-else class="show-password" @click="handlePassword">
+                    <vab-icon :icon="['fas', 'eye']"></vab-icon>
+                  </span>
+                </el-form-item>
+                <el-button
+                  :loading="loading"
+                  class="login-btn"
+                  type="primary"
+                  @click="handleLogin"
+                >
+                  登录
+                </el-button>
+                <el-button type="primary" @click="handleSocialLogin">
+                  点击进行qq登录
+                </el-button>
+                <router-link to="/register">
+                  <div style="margin-top: 20px">注册</div>
+                </router-link>
+              </el-form>
+            </el-tab-pane>
+          </el-tabs>
+        </div>
+      </el-col>
+      <el-col :xs="6" :sm="6" :md="6" :lg="6" :xl="6">
+        <div style="color: transparent">占位符</div>
       </el-col>
     </el-row>
   </div>
@@ -131,6 +147,7 @@
         loading: false,
         passwordType: 'password',
         redirect: undefined,
+        activeName: 'first',
       }
     },
     watch: {
@@ -155,6 +172,9 @@
       }, 10000000000)
     },
     methods: {
+      handleClick(tab, event) {
+        console.log(tab, event)
+      },
       handlePassword() {
         this.passwordType === 'password'
           ? (this.passwordType = '')
@@ -218,24 +238,9 @@
 <style lang="scss" scoped>
   .login-container {
     height: 100vh;
-    background: url('~@/assets/login_images/background.jpg') center center fixed
+    background: url('~@/assets/login_images/bg.png') center center fixed
       no-repeat;
     background-size: cover;
-
-    .title {
-      font-size: 54px;
-      font-weight: 500;
-      color: rgba(14, 18, 26, 1);
-    }
-
-    .title-tips {
-      margin-top: 29px;
-      font-size: 26px;
-      font-weight: 400;
-      color: rgba(14, 18, 26, 1);
-      text-overflow: ellipsis;
-      white-space: nowrap;
-    }
 
     .login-btn {
       display: inherit;
@@ -249,23 +254,56 @@
       }
     }
 
-    .login-form {
+    /* sign-tab登录标签 */
+    .sign-container-content {
       position: relative;
-      max-width: 100%;
-      margin: calc((100vh - 425px) / 2) 10% 10%;
+      max-width: 50%;
+      margin: calc((100vh - 500px) / 2) 34% 30% 34%;
       overflow: hidden;
+      background-color: #fff;
+      border-radius: 2px;
 
-      .forget-password {
-        width: 100%;
-        margin-top: 40px;
-        text-align: left;
+      .sign-flow-login-content {
+        padding: 0 24px 84px;
+        overflow: hidden;
 
-        .forget-pass {
-          width: 129px;
-          height: 19px;
-          font-size: 20px;
-          font-weight: 400;
-          color: rgba(92, 102, 240, 1);
+        .forget-password {
+          width: 100%;
+          margin-top: 40px;
+          text-align: left;
+
+          .forget-pass {
+            width: 129px;
+            height: 19px;
+            font-size: 20px;
+            font-weight: 400;
+            color: rgba(92, 102, 240, 1);
+          }
+        }
+        ::v-deep {
+          /*tabs 去掉el-tab的灰色下划线*/
+          .el-tabs__nav-wrap::after {
+            position: static !important;
+          }
+          .el-tabs__item {
+            padding: 0 !important;
+            display: inline-block;
+            color: #444;
+            border: none;
+            height: 60px;
+            line-height: 60px;
+            margin: 0 10px 0 10px;
+            font-size: 16px;
+            cursor: pointer;
+          }
+          .el-tabs__item.is-active {
+            font-weight: 600;
+            border-bottom: 3px solid #0084ff;
+          }
+          /*tabs 去掉el-tab-pane切换时的蓝色下划线*/
+          .el-tabs__active-bar {
+            background-color: transparent !important;
+          }
         }
       }
     }
