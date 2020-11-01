@@ -12,77 +12,158 @@
       </el-col>
       <el-col :xs="12" :sm="12" :md="12" :lg="12" :xl="12">
         <div class="sign-container-content">
-          <el-tabs
-            v-model="activeName"
-            class="sign-flow-login-content"
-            @tab-click="handleClick"
-          >
-            <el-tab-pane label="免密码登录" name="first">
-              免密码登录
-            </el-tab-pane>
-            <el-tab-pane label="密码登录" name="second">
-              <el-form
-                ref="form"
-                :model="form"
-                :rules="rules"
-                class="login-form"
-                label-position="left"
-              >
-                <div class="title">hello !</div>
-                <div class="title-tips">欢迎来到{{ title }}！</div>
-                <el-form-item style="margin-top: 40px" prop="username">
-                  <span class="svg-container svg-container-admin">
-                    <vab-icon :icon="['fas', 'user']" />
-                  </span>
-                  <el-input
-                    v-model.trim="form.username"
-                    v-focus
-                    placeholder="请输入用户名"
-                    tabindex="1"
-                    type="text"
-                  />
-                </el-form-item>
-                <el-form-item prop="password">
-                  <span class="svg-container">
-                    <vab-icon :icon="['fas', 'lock']" />
-                  </span>
-                  <el-input
-                    :key="passwordType"
-                    ref="password"
-                    v-model.trim="form.password"
-                    :type="passwordType"
-                    tabindex="2"
-                    placeholder="请输入密码"
-                    @keyup.enter.native="handleLogin"
-                  />
-                  <span
-                    v-if="passwordType === 'password'"
-                    class="show-password"
-                    @click="handlePassword"
-                  >
-                    <vab-icon :icon="['fas', 'eye-slash']"></vab-icon>
-                  </span>
-                  <span v-else class="show-password" @click="handlePassword">
-                    <vab-icon :icon="['fas', 'eye']"></vab-icon>
-                  </span>
-                </el-form-item>
-                <el-button
-                  :loading="loading"
-                  class="login-btn"
-                  type="primary"
-                  @click="handleLogin"
+          <div class="sign-flow-login-content">
+            <el-tabs v-model="activeName" @tab-click="handleClick">
+              <el-tab-pane label="免密码登录" name="first">
+                <el-form
+                  ref="form"
+                  :model="form"
+                  :rules="rules"
+                  label-position="left"
                 >
-                  登录
-                </el-button>
-                <el-button type="primary" @click="handleSocialLogin">
-                  点击进行qq登录
-                </el-button>
-                <router-link to="/register">
-                  <div style="margin-top: 20px">注册</div>
-                </router-link>
-              </el-form>
-            </el-tab-pane>
-          </el-tabs>
+                  <el-form-item prop="username">
+                    <el-input
+                      v-model.trim="input3"
+                      placeholder="手机号"
+                      tabindex="1"
+                      type="text"
+                    >
+                      <el-select
+                        slot="prepend"
+                        v-model="select"
+                        placeholder="中国 +86"
+                      >
+                        <el-option label="中国 +86" value="1"></el-option>
+                        <el-option label="中国香港 +852" value="2"></el-option>
+                        <el-option label="中国澳门 +853" value="3"></el-option>
+                        <el-option label="中国台湾 +886" value="4"></el-option>
+                        <el-option label="美国 +1" value="5"></el-option>
+                        <el-option label="日本 +81" value="6"></el-option>
+                        <el-option label="马来西亚 +60" value="7"></el-option>
+                        <el-option label="澳大利亚 +61" value="8"></el-option>
+                        <el-option label="加拿大 +1" value="9"></el-option>
+                        <el-option label="英国 +44" value="10"></el-option>
+                        <el-option label="新加坡 +65" value="11"></el-option>
+                        <el-option label="德国 +49" value="12"></el-option>
+                        <el-option label="俄罗斯 +7" value="13"></el-option>
+                        <el-option label="埃及 +20" value="14"></el-option>
+                        <el-option label="南非 +27" value="15"></el-option>
+                        <el-option label="希腊 +30" value="16"></el-option>
+                        <el-option label="荷兰 +31" value="17"></el-option>
+                      </el-select>
+                    </el-input>
+                  </el-form-item>
+                  <el-form-item prop="password">
+                    <el-input
+                      :key="passwordType"
+                      ref="password"
+                      v-model.trim="form.password"
+                      :type="passwordType"
+                      tabindex="2"
+                      placeholder="请输入 6 位短信验证码"
+                      @keyup.enter.native="handleLogin"
+                    >
+                      <template slot="append">Http://</template>
+                    </el-input>
+                  </el-form-item>
+                  <div class="login-options">
+                    <el-link type="info" :underline="false">忘记密码?</el-link>
+                  </div>
+                  <el-button
+                    :loading="loading"
+                    size="medium"
+                    class="login-btn"
+                    type="primary"
+                    @click="handleLogin"
+                  >
+                    注册/登录
+                  </el-button>
+                </el-form>
+              </el-tab-pane>
+              <el-tab-pane label="密码登录" name="second">
+                <el-form
+                  ref="form"
+                  :model="form"
+                  :rules="rules"
+                  label-position="left"
+                >
+                  <el-form-item prop="username">
+                    <el-input
+                      v-model.trim="form.username"
+                      placeholder="手机号或邮箱"
+                      tabindex="1"
+                      type="text"
+                    />
+                  </el-form-item>
+                  <el-form-item prop="password">
+                    <el-input
+                      :key="passwordType"
+                      ref="password"
+                      v-model.trim="form.password"
+                      :type="passwordType"
+                      tabindex="2"
+                      placeholder="密码"
+                      @keyup.enter.native="handleLogin"
+                    />
+                    <span
+                      v-if="passwordType === 'password'"
+                      class="show-password"
+                      @click="handlePassword"
+                    >
+                      <vab-icon :icon="['fas', 'eye-slash']"></vab-icon>
+                    </span>
+                    <span v-else class="show-password" @click="handlePassword">
+                      <vab-icon :icon="['fas', 'eye']"></vab-icon>
+                    </span>
+                  </el-form-item>
+                  <div class="login-options">
+                    <el-link type="info" :underline="false">忘记密码?</el-link>
+                  </div>
+                  <el-button
+                    :loading="loading"
+                    size="medium"
+                    class="login-btn"
+                    type="primary"
+                    @click="handleLogin"
+                  >
+                    登录
+                  </el-button>
+                </el-form>
+              </el-tab-pane>
+            </el-tabs>
+            <div class="sign-container-tip">
+              <span>未注册手机验证后自动登录，注册即代表同意</span>
+              <el-link type="info" :underline="false">《xxx协议》</el-link>
+              <el-link type="info" :underline="false">《隐私保护指引》</el-link>
+            </div>
+            <div id="form-social-line"></div>
+            <div class="social-login">
+              <div
+                style="
+                  float: left;
+                  height: 44px;
+                  display: flex;
+                  align-items: center;
+                "
+              >
+                社交帐号登录
+              </div>
+              <div style="float: right">
+                <div class="social-block" @click="handleSocialLogin(1)">
+                  <img src="~@/assets/login_images/wechat.png" />
+                  <p>微信</p>
+                </div>
+                <div class="social-block" @click="handleSocialLogin(2)">
+                  <img src="~@/assets/login_images/qq.png" />
+                  <p>QQ</p>
+                </div>
+                <div class="social-block" @click="handleSocialLogin(3)">
+                  <img src="~@/assets/login_images/weibo.png" />
+                  <p>微博</p>
+                </div>
+              </div>
+            </div>
+          </div>
         </div>
       </el-col>
       <el-col :xs="6" :sm="6" :md="6" :lg="6" :xl="6">
@@ -99,17 +180,10 @@
 
   export default {
     name: 'Login',
-    directives: {
-      focus: {
-        inserted(el) {
-          el.querySelector('input').focus()
-        },
-      },
-    },
     data() {
       const validateusername = (rule, value, callback) => {
         if ('' === value) {
-          callback(new Error('用户名不能为空'))
+          callback(new Error('请输入手机号或邮箱'))
         } else {
           callback()
         }
@@ -148,6 +222,8 @@
         passwordType: 'password',
         redirect: undefined,
         activeName: 'first',
+        input3: '',
+        select: '',
       }
     },
     watch: {
@@ -165,11 +241,8 @@
       document.body.style.overflow = 'auto'
     },
     mounted() {
-      this.form.username = 'admin'
-      this.form.password = '123456'
-      setTimeout(() => {
-        this.handleLogin()
-      }, 10000000000)
+      this.form.username = ''
+      this.form.password = ''
     },
     methods: {
       handleClick(tab, event) {
@@ -243,15 +316,8 @@
     background-size: cover;
 
     .login-btn {
-      display: inherit;
-      width: 150px;
-      height: 40px;
-      margin-top: 5px;
-      border: 0;
-
-      &:hover {
-        opacity: 0.9;
-      }
+      width: 100%;
+      margin-top: 15px;
     }
 
     /* sign-tab登录标签 */
@@ -264,20 +330,44 @@
       border-radius: 2px;
 
       .sign-flow-login-content {
-        padding: 0 24px 84px;
+        padding: 0 24px 20px;
         overflow: hidden;
 
-        .forget-password {
-          width: 100%;
-          margin-top: 40px;
-          text-align: left;
+        .login-options {
+          padding: 0 0 15px 0;
+          position: relative;
+          overflow: hidden;
+          text-align: right;
+        }
+        .sign-container-tip {
+          position: relative;
+          padding: 40px 0 0 0;
+          color: grey;
+          font-weight: 500;
+        }
+        .form-social-line {
+          margin: 15px 0 15px 0;
+          border-top: 1px solid #ebebeb;
+        }
+        .social-login {
+          color: #8590a6;
+          font-size: 16px;
+          font-weight: 500;
+        }
 
-          .forget-pass {
-            width: 129px;
-            height: 19px;
-            font-size: 20px;
-            font-weight: 400;
-            color: rgba(92, 102, 240, 1);
+        .social-block {
+          display: inline-block;
+          font-size: 14px;
+          cursor: pointer;
+          margin-left: 22px;
+          p {
+            display: inline-block;
+          }
+          img {
+            width: 20px;
+            height: 20px;
+            margin-right: 6px;
+            vertical-align: middle;
           }
         }
         ::v-deep {
@@ -288,13 +378,24 @@
           .el-tabs__item {
             padding: 0 !important;
             display: inline-block;
-            color: #444;
+            color: #121212;
             border: none;
             height: 60px;
             line-height: 60px;
-            margin: 0 10px 0 10px;
+            margin: 0 10px 0 0;
             font-size: 16px;
             cursor: pointer;
+          }
+          .el-select {
+            width: 90px;
+            background-color: #fff;
+          }
+          .el-select__input {
+            padding: 0 0 0 0;
+            border-top-width: 0;
+            border-left-width: 0;
+            border-right-width: 0;
+            border-bottom-width: 1px;
           }
           .el-tabs__item.is-active {
             font-weight: 600;
@@ -303,6 +404,16 @@
           /*tabs 去掉el-tab-pane切换时的蓝色下划线*/
           .el-tabs__active-bar {
             background-color: transparent !important;
+          }
+          .el-input__inner {
+            height: 48px;
+            padding: 0 0 0 0;
+            border-top-width: 0;
+            border-left-width: 0;
+            border-right-width: 0;
+            border-bottom-width: 1px;
+            font-size: 15px;
+            font-weight: 500;
           }
         }
       }
@@ -345,52 +456,12 @@
 
     .show-password {
       position: absolute;
-      top: 14px;
-      right: 25px;
-      font-size: 16px;
-      color: #d7dee3;
+      top: 5px;
+      right: 1px;
+      font-size: 18px;
+      color: #8590a6;
       cursor: pointer;
       user-select: none;
-    }
-
-    ::v-deep {
-      .el-form-item {
-        padding-right: 0;
-        margin: 20px 0;
-        color: #454545;
-        background: transparent;
-        border: 1px solid transparent;
-        border-radius: 2px;
-
-        &__content {
-          min-height: $base-input-height;
-          line-height: $base-input-height;
-        }
-
-        &__error {
-          position: absolute;
-          top: 100%;
-          left: 18px;
-          font-size: $base-font-size-small;
-          line-height: 18px;
-          color: $base-color-red;
-        }
-      }
-
-      .el-input {
-        box-sizing: border-box;
-
-        input {
-          height: 58px;
-          padding-left: 45px;
-          font-size: $base-font-size-default;
-          line-height: 58px;
-          color: $base-font-color;
-          background: #f6f4fc;
-          border: 0;
-          caret-color: $base-font-color;
-        }
-      }
     }
   }
 </style>
