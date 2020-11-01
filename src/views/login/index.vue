@@ -24,7 +24,7 @@
                   <el-form-item prop="username">
                     <el-input
                       v-model.trim="input3"
-                      placeholder="手机号"
+                      placeholder="   手机号"
                       tabindex="1"
                       type="text"
                     >
@@ -386,15 +386,12 @@
             font-size: 16px;
             cursor: pointer;
           }
-          .el-select {
-            width: 90px;
+          .el-input-group__prepend {
+            width: 50px;
             background-color: #fff;
-          }
-          .el-select__input {
-            padding: 0 0 0 0;
             border-top-width: 0;
             border-left-width: 0;
-            border-right-width: 0;
+            border-right: 1px inset #cccccc;
             border-bottom-width: 1px;
           }
           .el-tabs__item.is-active {
