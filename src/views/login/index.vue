@@ -142,7 +142,7 @@
               <el-link type="info" :underline="false">《xxx协议》</el-link>
               <el-link type="info" :underline="false">《隐私保护指引》</el-link>
             </div>
-            <div id="form-social-line"></div>
+            <div class="form-social-line"></div>
             <div class="social-login">
               <div
                 style="
@@ -246,7 +246,6 @@
         passwordType: 'password',
         redirect: undefined,
         activeName: 'first',
-        input3: '',
         select: '',
       }
     },
@@ -323,7 +322,7 @@
         })
       },
       handleSocialLogin(providerId) {
-        const url = baseURL + '/auth2/authorization/qq' + providerId
+        const url = baseURL + '/auth2/authorization/' + providerId
         console.log(url)
         openWindow(url, '第三方登录', 540, 540)
         window.addEventListener('message', this.loginSocial, false)
@@ -465,6 +464,7 @@
             border-bottom-width: 1px;
             font-size: 15px;
             font-weight: 500;
+            border-radius: 0;
           }
         }
       }

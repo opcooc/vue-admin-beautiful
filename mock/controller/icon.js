@@ -959,6 +959,7 @@ const data = [
   'x-ray',
   'yen-sign',
   'yin-yang',
+  'chevron-left',
 ]
 module.exports = [
   {

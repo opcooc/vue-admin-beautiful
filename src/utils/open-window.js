@@ -23,7 +23,7 @@ export function openWindow(url, title, w, h) {
     ? document.documentElement.clientHeight
     : screen.height
 
-  const left = width / 2 - w / 2 + dualScreenLeft
+  const left = width / 3 - w / 2 + dualScreenLeft
   const top = height / 2 - h / 2 + dualScreenTop
   const newWindow = window.open(
     url,
