@@ -18,56 +18,62 @@
                 <el-form
                   ref="form"
                   :model="form"
-                  :rules="rules"
+                  :rules="registerRules"
                   label-position="left"
                 >
-                  <el-form-item prop="username">
+                  <el-form-item prop="phone">
+                    <el-select
+                      v-model="select"
+                      style="width: 25%"
+                      placeholder="中国 +86"
+                    >
+                      <el-option label="中国 +86" value="1"></el-option>
+                      <el-option label="中国香港 +852" value="2"></el-option>
+                      <el-option label="中国澳门 +853" value="3"></el-option>
+                      <el-option label="中国台湾 +886" value="4"></el-option>
+                      <el-option label="美国 +1" value="5"></el-option>
+                      <el-option label="日本 +81" value="6"></el-option>
+                      <el-option label="马来西亚 +60" value="7"></el-option>
+                      <el-option label="澳大利亚 +61" value="8"></el-option>
+                      <el-option label="加拿大 +1" value="9"></el-option>
+                      <el-option label="英国 +44" value="10"></el-option>
+                      <el-option label="新加坡 +65" value="11"></el-option>
+                      <el-option label="德国 +49" value="12"></el-option>
+                      <el-option label="俄罗斯 +7" value="13"></el-option>
+                      <el-option label="埃及 +20" value="14"></el-option>
+                      <el-option label="南非 +27" value="15"></el-option>
+                      <el-option label="希腊 +30" value="16"></el-option>
+                      <el-option label="荷兰 +31" value="17"></el-option>
+                    </el-select>
                     <el-input
-                      v-model.trim="input3"
-                      placeholder="   手机号"
+                      v-model.trim="form.phone"
+                      placeholder=" 手机号"
                       tabindex="1"
+                      maxlength="11"
+                      style="width: 75%"
+                      show-word-limit
                       type="text"
-                    >
-                      <el-select
-                        slot="prepend"
-                        v-model="select"
-                        placeholder="中国 +86"
-                      >
-                        <el-option label="中国 +86" value="1"></el-option>
-                        <el-option label="中国香港 +852" value="2"></el-option>
-                        <el-option label="中国澳门 +853" value="3"></el-option>
-                        <el-option label="中国台湾 +886" value="4"></el-option>
-                        <el-option label="美国 +1" value="5"></el-option>
-                        <el-option label="日本 +81" value="6"></el-option>
-                        <el-option label="马来西亚 +60" value="7"></el-option>
-                        <el-option label="澳大利亚 +61" value="8"></el-option>
-                        <el-option label="加拿大 +1" value="9"></el-option>
-                        <el-option label="英国 +44" value="10"></el-option>
-                        <el-option label="新加坡 +65" value="11"></el-option>
-                        <el-option label="德国 +49" value="12"></el-option>
-                        <el-option label="俄罗斯 +7" value="13"></el-option>
-                        <el-option label="埃及 +20" value="14"></el-option>
-                        <el-option label="南非 +27" value="15"></el-option>
-                        <el-option label="希腊 +30" value="16"></el-option>
-                        <el-option label="荷兰 +31" value="17"></el-option>
-                      </el-select>
-                    </el-input>
+                      autocomplete="off"
+                    ></el-input>
                   </el-form-item>
-                  <el-form-item prop="password">
+                  <el-form-item prop="phoneCode" style="position: relative">
                     <el-input
-                      :key="passwordType"
-                      ref="password"
-                      v-model.trim="form.password"
-                      :type="passwordType"
-                      tabindex="2"
+                      v-model.trim="form.phoneCode"
+                      type="text"
                       placeholder="请输入 6 位短信验证码"
-                      @keyup.enter.native="handleLogin"
+                    ></el-input>
+                    <el-button
+                      class="show-pwd phone-code"
+                      :disabled="isGetphone"
+                      @click="getPhoneCode"
                     >
-                      <template slot="append">Http://</template>
-                    </el-input>
+                      {{ phoneCode }}
+                    </el-button>
                   </el-form-item>
                   <div class="login-options">
-                    <el-link type="info" :underline="false">忘记密码?</el-link>
+                    <el-link type="info" :underline="false">
+                      接收语音验证码?
+                    </el-link>
                   </div>
                   <el-button
                     :loading="loading"
@@ -149,15 +155,15 @@
                 社交帐号登录
               </div>
               <div style="float: right">
-                <div class="social-block" @click="handleSocialLogin(1)">
+                <div class="social-block" @click="handleSocialLogin('wechat')">
                   <img src="~@/assets/login_images/wechat.png" />
                   <p>微信</p>
                 </div>
-                <div class="social-block" @click="handleSocialLogin(2)">
+                <div class="social-block" @click="handleSocialLogin('qq')">
                   <img src="~@/assets/login_images/qq.png" />
                   <p>QQ</p>
                 </div>
-                <div class="social-block" @click="handleSocialLogin(3)">
+                <div class="social-block" @click="handleSocialLogin('weibo')">
                   <img src="~@/assets/login_images/weibo.png" />
                   <p>微博</p>
                 </div>
@@ -174,9 +180,9 @@
 </template>
 
 <script>
-  import { isPassword } from '@/utils/validate'
   import { openWindow } from '@/utils/open-window'
   import { baseURL } from '@/config/settings'
+  import { isPassword, isPhone } from '@/utils/validate'
 
   export default {
     name: 'Login',
@@ -195,9 +201,18 @@
           callback()
         }
       }
+      const validatePhone = (rule, value, callback) => {
+        if (!isPhone(value)) {
+          callback(new Error('请输入正确的手机号'))
+        } else {
+          callback()
+        }
+      }
       return {
         nodeEnv: process.env.NODE_ENV,
         title: this.$baseTitle,
+        isGetphone: false,
+        phoneCode: '获取验证码',
         form: {
           username: '',
           password: '',
@@ -216,6 +231,15 @@
               trigger: 'blur',
               validator: validatePassword,
             },
+          ],
+        },
+        registerRules: {
+          phone: [
+            { required: true, trigger: 'blur', message: '请输入手机号码' },
+            { validator: validatePhone, trigger: 'blur' },
+          ],
+          phoneCode: [
+            { required: true, trigger: 'blur', message: '请输入手机验证码' },
           ],
         },
         loading: false,
@@ -256,6 +280,26 @@
           this.$refs.password.focus()
         })
       },
+      getPhoneCode() {
+        if (!isPhone(this.form.phone)) {
+          //this.$baseMessage('请输入手机号', 'error')
+          this.$refs['registerForm'].validateField('phone')
+          return
+        }
+        this.isGetphone = true
+        let n = 60
+        this.getPhoneIntval = setInterval(() => {
+          if (n > 0) {
+            n--
+            this.phoneCode = '重新获取(' + n + 's)'
+          } else {
+            this.getPhoneIntval = null
+            clearInterval(this.getPhoneIntval)
+            this.phoneCode = '获取验证码'
+            this.isGetphone = false
+          }
+        }, 1000)
+      },
       handleLogin() {
         this.$refs.form.validate((valid) => {
           if (valid) {
@@ -278,9 +322,10 @@
           }
         })
       },
-      handleSocialLogin() {
-        console.log(baseURL + '/auth2/authorization/qq')
-        openWindow(baseURL + '/auth2/authorization/qq', '绑定QQ', 540, 540)
+      handleSocialLogin(providerId) {
+        const url = baseURL + '/auth2/authorization/qq' + providerId
+        console.log(url)
+        openWindow(url, '第三方登录', 540, 540)
         window.addEventListener('message', this.loginSocial, false)
       },
       loginSocial(e) {
@@ -324,7 +369,7 @@
     .sign-container-content {
       position: relative;
       max-width: 50%;
-      margin: calc((100vh - 500px) / 2) 34% 30% 34%;
+      margin: calc((100vh - 500px) / 2) 30% 30% 30%;
       overflow: hidden;
       background-color: #fff;
       border-radius: 2px;
@@ -370,6 +415,23 @@
             vertical-align: middle;
           }
         }
+        .show-pwd {
+          position: absolute;
+          top: 6px;
+          right: 0;
+          font-size: 15px;
+          color: #175199;
+          cursor: pointer;
+          user-select: none;
+        }
+        .phone-code {
+          border-top-width: 0;
+          border-left-width: 0;
+          border-right-width: 0;
+          border-bottom-width: 0;
+          font-size: 15px;
+          font-weight: 500;
+        }
         ::v-deep {
           /*tabs 去掉el-tab的灰色下划线*/
           .el-tabs__nav-wrap::after {
@@ -386,14 +448,6 @@
             font-size: 16px;
             cursor: pointer;
           }
-          .el-input-group__prepend {
-            width: 50px;
-            background-color: #fff;
-            border-top-width: 0;
-            border-left-width: 0;
-            border-right: 1px inset #cccccc;
-            border-bottom-width: 1px;
-          }
           .el-tabs__item.is-active {
             font-weight: 600;
             border-bottom: 3px solid #0084ff;
@@ -403,7 +457,7 @@
             background-color: transparent !important;
           }
           .el-input__inner {
-            height: 48px;
+            height: 45px;
             padding: 0 0 0 0;
             border-top-width: 0;
             border-left-width: 0;
