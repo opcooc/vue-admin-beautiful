@@ -129,10 +129,14 @@
 <script>
   import { openWindow } from '@/utils/open-window'
   import { baseURL } from '@/config/settings'
-  import { isPassword, isPhone } from '@/utils/validate'
+  import { isPhone } from '@/utils/validate'
+  import {
+    getTemporaryToken,
+    removeTemporaryToken,
+  } from '@/utils/socialTemporaryToken'
 
   export default {
-    name: 'Login',
+    name: 'Register',
     data() {
       const validatePhone = (rule, value, callback) => {
         if (!isPhone(value)) {
@@ -162,6 +166,7 @@
         loading: false,
         passwordType: 'password',
         redirect: undefined,
+        socialAuthorizationUrl: baseURL + '/auth2/authorization/',
         select: '',
       }
     },
@@ -184,16 +189,9 @@
       this.form.password = ''
     },
     methods: {
-      handleClick(tab, event) {
-        console.log(tab, event)
-      },
-      handlePassword() {
-        this.passwordType === 'password'
-          ? (this.passwordType = '')
-          : (this.passwordType = 'password')
-        this.$nextTick(() => {
-          this.$refs.password.focus()
-        })
+      handlePreviousLogin() {
+        removeTemporaryToken()
+        this.$router.push('/login').catch(() => {})
       },
       getPhoneCode() {
         if (!isPhone(this.form.phone)) {
@@ -216,6 +214,7 @@
         }, 1000)
       },
       handleLogin() {
+        console.log('handleLogin' + getTemporaryToken())
         this.$refs.form.validate((valid) => {
           if (valid) {
             this.loading = true
@@ -238,7 +237,7 @@
         })
       },
       handleSocialLogin(providerId) {
-        const url = baseURL + '/auth2/authorization/' + providerId
+        const url = this.socialAuthorizationUrl + providerId
         console.log(url)
         openWindow(url, '第三方登录', 540, 540)
         window.addEventListener('message', this.loginSocial, false)
@@ -284,7 +283,8 @@
     .sign-container-content {
       position: relative;
       max-width: 50%;
-      margin: calc((100vh - 500px) / 2) 30% 30% 30%;
+      margin: calc((100vh - 500px) / 2) calc((100vh - 400px) / 2)
+        calc((100vh - 500px) / 2) calc((100vh - 400px) / 2);
       overflow: hidden;
       background-color: #fff;
       border-radius: 2px;
@@ -388,9 +388,10 @@
         margin-left: 20px;
         color: #2c3e50;
         text-align: center;
+        cursor: pointer;
       }
       .title-info {
-        margin-left: 100px;
+        margin-left: 120px;
         display: inline-block;
         position: relative;
         font-size: 25px;
@@ -398,39 +399,6 @@
         color: #2c3e50;
         text-align: center;
       }
-    }
-
-    .tips {
-      margin-bottom: 10px;
-      font-size: $base-font-size-default;
-      color: $base-color-white;
-
-      span {
-        &:first-of-type {
-          margin-right: 16px;
-        }
-      }
-    }
-
-    .svg-container {
-      position: absolute;
-      top: 14px;
-      left: 15px;
-      z-index: $base-z-index;
-      font-size: 16px;
-      color: #d7dee3;
-      cursor: pointer;
-      user-select: none;
-    }
-
-    .show-password {
-      position: absolute;
-      top: 5px;
-      right: 1px;
-      font-size: 18px;
-      color: #8590a6;
-      cursor: pointer;
-      user-select: none;
     }
   }
 </style>

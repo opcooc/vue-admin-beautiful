@@ -13,17 +13,17 @@
       <el-col :xs="12" :sm="12" :md="12" :lg="12" :xl="12">
         <div class="sign-container-content">
           <div class="sign-flow-login-content">
-            <el-tabs v-model="activeName" @tab-click="handleClick">
+            <el-tabs v-model="loginType" @tab-click="handleClick">
               <el-tab-pane label="免密码登录" name="first">
                 <el-form
-                  ref="form"
-                  :model="form"
-                  :rules="registerRules"
+                  ref="phoneLoginForm"
+                  :model="phoneLoginForm"
+                  :rules="phoneLoginRules"
                   label-position="left"
                 >
                   <el-form-item prop="phone">
                     <el-select
-                      v-model="select"
+                      v-model="phoneLoginForm.areaCode"
                       style="width: 25%"
                       placeholder="中国 +86"
                     >
@@ -46,7 +46,7 @@
                       <el-option label="荷兰 +31" value="17"></el-option>
                     </el-select>
                     <el-input
-                      v-model.trim="form.phone"
+                      v-model.trim="phoneLoginForm.phone"
                       placeholder=" 手机号"
                       tabindex="1"
                       maxlength="11"
@@ -58,7 +58,7 @@
                   </el-form-item>
                   <el-form-item prop="phoneCode" style="position: relative">
                     <el-input
-                      v-model.trim="form.phoneCode"
+                      v-model.trim="phoneLoginForm.phoneCode"
                       type="text"
                       placeholder="请输入 6 位短信验证码"
                     ></el-input>
@@ -80,7 +80,7 @@
                     size="medium"
                     class="login-btn"
                     type="primary"
-                    @click="handleLogin"
+                    @click="handlePhoneLogin"
                   >
                     注册/登录
                   </el-button>
@@ -88,14 +88,14 @@
               </el-tab-pane>
               <el-tab-pane label="密码登录" name="second">
                 <el-form
-                  ref="form"
-                  :model="form"
-                  :rules="rules"
+                  ref="accountLoginForm"
+                  :model="accountLoginForm"
+                  :rules="accountLoginRules"
                   label-position="left"
                 >
                   <el-form-item prop="username">
                     <el-input
-                      v-model.trim="form.username"
+                      v-model.trim="accountLoginForm.username"
                       placeholder="手机号或邮箱"
                       tabindex="1"
                       type="text"
@@ -105,11 +105,11 @@
                     <el-input
                       :key="passwordType"
                       ref="password"
-                      v-model.trim="form.password"
+                      v-model.trim="accountLoginForm.password"
                       :type="passwordType"
                       tabindex="2"
                       placeholder="密码"
-                      @keyup.enter.native="handleLogin"
+                      @keyup.enter.native="handleAccountLogin"
                     />
                     <span
                       v-if="passwordType === 'password'"
@@ -130,7 +130,7 @@
                     size="medium"
                     class="login-btn"
                     type="primary"
-                    @click="handleLogin"
+                    @click="handleAccountLogin"
                   >
                     登录
                   </el-button>
@@ -183,7 +183,11 @@
   import { openWindow } from '@/utils/open-window'
   import { baseURL } from '@/config/settings'
   import { isPassword, isPhone } from '@/utils/validate'
-
+  import {
+    setTemporaryToken,
+    getTemporaryToken,
+    removeTemporaryToken,
+  } from '@/utils/socialTemporaryToken'
   export default {
     name: 'Login',
     data() {
@@ -213,11 +217,11 @@
         title: this.$baseTitle,
         isGetphone: false,
         phoneCode: '获取验证码',
-        form: {
+        accountLoginForm: {
           username: '',
           password: '',
         },
-        rules: {
+        accountLoginRules: {
           username: [
             {
               required: true,
@@ -233,7 +237,12 @@
             },
           ],
         },
-        registerRules: {
+        phoneLoginForm: {
+          areaCode: '1',
+          phone: '',
+          phoneCode: '',
+        },
+        phoneLoginRules: {
           phone: [
             { required: true, trigger: 'blur', message: '请输入手机号码' },
             { validator: validatePhone, trigger: 'blur' },
@@ -245,7 +254,8 @@
         loading: false,
         passwordType: 'password',
         redirect: undefined,
-        activeName: 'first',
+        loginType: 'first',
+        socialAuthorizationUrl: baseURL + '/auth2/authorization/',
         select: '',
       }
     },
@@ -264,12 +274,30 @@
       document.body.style.overflow = 'auto'
     },
     mounted() {
-      this.form.username = ''
-      this.form.password = ''
+      this.empty('accountLoginForm')
+      this.empty('phoneLoginForm')
     },
     methods: {
       handleClick(tab, event) {
-        console.log(tab, event)
+        if (tab.name === 'first') {
+          this.empty('accountLoginForm')
+        } else {
+          this.empty('phoneLoginForm')
+        }
+      },
+      empty(form) {
+        //重置
+        //根据需求二选一
+        /**
+         * 移除校验结果并重置字段值
+         * 注：清除表单项name的校验及数值
+         */
+        this.$refs[form].resetFields()
+        /**
+         * 移除校验结果
+         * 注：只清除表单项name的校验，不清楚表单项name的数值
+         */
+        // this.$refs.form.clearValidate('name')
       },
       handlePassword() {
         this.passwordType === 'password'
@@ -280,9 +308,9 @@
         })
       },
       getPhoneCode() {
-        if (!isPhone(this.form.phone)) {
+        if (!isPhone(this.phoneLoginForm.phone)) {
           //this.$baseMessage('请输入手机号', 'error')
-          this.$refs['registerForm'].validateField('phone')
+          this.$refs['phoneLoginForm'].validateField('phone')
           return
         }
         this.isGetphone = true
@@ -299,12 +327,36 @@
           }
         }, 1000)
       },
-      handleLogin() {
-        this.$refs.form.validate((valid) => {
+      handleAccountLogin() {
+        this.$refs.accountLoginForm.validate((valid) => {
+          console.log(this.accountLoginForm)
           if (valid) {
             this.loading = true
             this.$store
-              .dispatch('user/login', this.form)
+              .dispatch('user/login', this.accountLoginForm)
+              .then(() => {
+                const routerPath =
+                  this.redirect === '/404' || this.redirect === '/401'
+                    ? '/'
+                    : this.redirect
+                this.$router.push(routerPath).catch(() => {})
+                this.loading = false
+              })
+              .catch(() => {
+                this.loading = false
+              })
+          } else {
+            return false
+          }
+        })
+      },
+      handlePhoneLogin() {
+        this.$refs.phoneLoginForm.validate((valid) => {
+          console.log(this.phoneLoginForm)
+          if (valid) {
+            this.loading = true
+            this.$store
+              .dispatch('user/login', this.phoneLoginForm)
               .then(() => {
                 const routerPath =
                   this.redirect === '/404' || this.redirect === '/401'
@@ -322,7 +374,7 @@
         })
       },
       handleSocialLogin(providerId) {
-        const url = baseURL + '/auth2/authorization/' + providerId
+        const url = this.socialAuthorizationUrl + providerId
         console.log(url)
         openWindow(url, '第三方登录', 540, 540)
         window.addEventListener('message', this.loginSocial, false)
@@ -330,19 +382,14 @@
       loginSocial(e) {
         const socialToken = e.data
         if (socialToken) {
-          this.$store
-            .dispatch('user/loginSocial', socialToken)
-            .then(() => {
-              const routerPath =
-                this.redirect === '/404' || this.redirect === '/401'
-                  ? '/'
-                  : this.redirect
-              this.$router.push(routerPath).catch(() => {})
-              this.loading = false
-            })
-            .catch(() => {
-              this.loading = false
-            })
+          // const routerPath =
+          //   this.redirect === '/404' || this.redirect === '/401'
+          //     ? '/'
+          //     : this.redirect
+          // this.$router.push(routerPath).catch(() => {})
+          setTemporaryToken(socialToken)
+          this.$router.push('/register').catch(() => {})
+          this.loading = false
           window.removeEventListener('message', this.loginSocial, false)
         } else {
           this.$baseMessage('第三方授权失败!', 'error')
@@ -368,7 +415,8 @@
     .sign-container-content {
       position: relative;
       max-width: 50%;
-      margin: calc((100vh - 500px) / 2) 30% 30% 30%;
+      margin: calc((100vh - 500px) / 2) calc((100vh - 400px) / 2)
+        calc((100vh - 500px) / 2) calc((100vh - 400px) / 2);
       overflow: hidden;
       background-color: #fff;
       border-radius: 2px;
@@ -468,41 +516,6 @@
           }
         }
       }
-    }
-
-    .tips {
-      margin-bottom: 10px;
-      font-size: $base-font-size-default;
-      color: $base-color-white;
-
-      span {
-        &:first-of-type {
-          margin-right: 16px;
-        }
-      }
-    }
-
-    .title-container {
-      position: relative;
-
-      .title {
-        margin: 0 auto 40px auto;
-        font-size: 34px;
-        font-weight: bold;
-        color: $base-color-blue;
-        text-align: center;
-      }
-    }
-
-    .svg-container {
-      position: absolute;
-      top: 14px;
-      left: 15px;
-      z-index: $base-z-index;
-      font-size: 16px;
-      color: #d7dee3;
-      cursor: pointer;
-      user-select: none;
     }
 
     .show-password {
