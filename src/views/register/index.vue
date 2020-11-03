@@ -20,14 +20,14 @@
           </div>
           <div class="sign-flow-login-content">
             <el-form
-              ref="form"
-              :model="form"
+              ref="registerForm"
+              :model="registerForm"
               :rules="registerRules"
               label-position="left"
             >
               <el-form-item prop="phone">
                 <el-select
-                  v-model="select"
+                  v-model="registerForm.areaCode"
                   style="width: 25%"
                   placeholder="中国 +86"
                 >
@@ -50,7 +50,7 @@
                   <el-option label="荷兰 +31" value="17"></el-option>
                 </el-select>
                 <el-input
-                  v-model.trim="form.phone"
+                  v-model.trim="registerForm.phone"
                   placeholder=" 手机号"
                   tabindex="1"
                   maxlength="11"
@@ -62,7 +62,7 @@
               </el-form-item>
               <el-form-item prop="phoneCode" style="position: relative">
                 <el-input
-                  v-model.trim="form.phoneCode"
+                  v-model.trim="registerForm.phoneCode"
                   type="text"
                   placeholder="请输入 6 位短信验证码"
                 ></el-input>
@@ -150,9 +150,10 @@
         title: this.$baseTitle,
         isGetphone: false,
         phoneCode: '获取验证码',
-        form: {
-          username: '',
-          password: '',
+        registerForm: {
+          areaCode: '1',
+          phone: '',
+          phoneCode: '',
         },
         registerRules: {
           phone: [
@@ -185,16 +186,29 @@
       document.body.style.overflow = 'auto'
     },
     mounted() {
-      this.form.username = ''
-      this.form.password = ''
+      this.empty('registerForm')
     },
     methods: {
+      empty(form) {
+        //重置
+        //根据需求二选一
+        /**
+         * 移除校验结果并重置字段值
+         * 注：清除表单项name的校验及数值
+         */
+        this.$refs[form].resetFields()
+        /**
+         * 移除校验结果
+         * 注：只清除表单项name的校验，不清楚表单项name的数值
+         */
+        // this.$refs.form.clearValidate('name')
+      },
       handlePreviousLogin() {
         removeTemporaryToken()
         this.$router.push('/login').catch(() => {})
       },
       getPhoneCode() {
-        if (!isPhone(this.form.phone)) {
+        if (!isPhone(this.registerForm.phone)) {
           //this.$baseMessage('请输入手机号', 'error')
           this.$refs['registerForm'].validateField('phone')
           return
@@ -215,7 +229,7 @@
       },
       handleLogin() {
         console.log('handleLogin' + getTemporaryToken())
-        this.$refs.form.validate((valid) => {
+        this.$refs.registerForm.validate((valid) => {
           if (valid) {
             this.loading = true
             this.$store
