@@ -15,8 +15,8 @@ const setting = {
   // 默认的接口地址 如果是开发环境和生产环境走vab-mock-server，当然你也可以选择自己配置成需要的接口地址
   baseURL:
     'development' === process.env.NODE_ENV
-      ? 'http://127.0.0.1:7500/admin'
-      : 'http://127.0.0.1:7500/admin',
+      ? 'http://127.0.0.1:9999/admin'
+      : 'http://127.0.0.1:9999/admin',
   //标题 （包括初次加载雪花屏的标题 页面的标题 浏览器的标题）
   title: 'opcooc',
   //简写
@@ -73,5 +73,9 @@ const setting = {
   templateFolder: 'project',
   //是否显示终端donation打印
   donation: true,
+  // 客户端id
+  clientId: '6psm1qqu6266rgt7xiovoyqp',
+  // 客户端密钥
+  clientSecret: '8mnr267u2w2t2s6dffai0y8b2bvi5vel',
 }
 module.exports = setting

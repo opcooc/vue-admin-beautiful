@@ -1,15 +1,25 @@
 import request from '@/utils/request'
+import { Base64 } from 'js-base64'
 import { encryptedData } from '@/utils/encrypt'
+import { clientId, clientSecret } from '@/config/settings'
 import { loginRSA, tokenName } from '@/config/settings'
 
 export async function login(data) {
-  if (loginRSA) {
-    data = await encryptedData(data)
-  }
+  // if (loginRSA) {
+  //   data = await encryptedData(data)
+  // }
   return request({
-    url: '/login',
+    url: '/oauth/token',
     method: 'post',
-    data,
+    headers: {
+      Authorization: `Basic ${Base64.encode(`${clientId}:${clientSecret}`)}`,
+    },
+    params: {
+      username: data.username,
+      password: data.password,
+      grant_type: 'password',
+      scope: 'userInfo',
+    },
   })
 }
 

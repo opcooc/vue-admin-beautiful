@@ -218,8 +218,8 @@
         isGetphone: false,
         phoneCode: '获取验证码',
         accountLoginForm: {
-          username: '',
-          password: '',
+          username: '18627985216',
+          password: '111111',
         },
         accountLoginRules: {
           username: [
@@ -382,11 +382,6 @@
       loginSocial(e) {
         const socialToken = e.data
         if (socialToken) {
-          // const routerPath =
-          //   this.redirect === '/404' || this.redirect === '/401'
-          //     ? '/'
-          //     : this.redirect
-          // this.$router.push(routerPath).catch(() => {})
           setTemporaryToken(socialToken)
           this.$router.push('/register').catch(() => {})
           this.loading = false
