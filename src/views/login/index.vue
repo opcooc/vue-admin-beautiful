@@ -218,7 +218,7 @@
         isGetphone: false,
         phoneCode: '获取验证码',
         accountLoginForm: {
-          username: '18627985216',
+          username: '18627985217',
           password: '111111',
         },
         accountLoginRules: {
