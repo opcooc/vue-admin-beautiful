@@ -84,6 +84,13 @@
                   >
                     注册/登录
                   </el-button>
+                  <Verify
+                    ref="verify"
+                    :mode="'fixed'"
+                    :captcha-type="'click_word'"
+                    :img-size="{ width: '330px', height: '155px' }"
+                    @success="successVerify"
+                  ></Verify>
                 </el-form>
               </el-tab-pane>
               <el-tab-pane label="密码登录" name="second">
@@ -183,6 +190,7 @@
   import { openWindow } from '@/utils/open-window'
   import { baseURL } from '@/config/settings'
   import { isPassword, isPhone } from '@/utils/validate'
+  import Verify from '@/components/verifition/Verify'
   import {
     setTemporaryToken,
     getTemporaryToken,
@@ -190,6 +198,9 @@
   } from '@/utils/socialTemporaryToken'
   export default {
     name: 'Login',
+    components: {
+      Verify,
+    },
     data() {
       const validateusername = (rule, value, callback) => {
         if ('' === value) {
@@ -326,6 +337,15 @@
             this.isGetphone = false
           }
         }, 1000)
+      },
+      successVerify(params) {
+        // params 返回的二次验证参数
+        console.log(params)
+        console.log('success')
+      },
+      showVerify() {
+        //当mode="pop"时,调用组件实例的show方法显示组件
+        this.$refs.verify.show()
       },
       handleAccountLogin() {
         this.$refs.accountLoginForm.validate((valid) => {
