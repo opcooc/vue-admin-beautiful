@@ -192,7 +192,6 @@
     line-height: 50px;
     text-align: left;
     font-size: 16px;
-    color: #45494c;
     border-bottom: 1px solid #e4e7eb;
     box-sizing: border-box;
   }
