@@ -86,8 +86,8 @@
                   </el-button>
                   <Verify
                     ref="verify"
-                    :mode="'fixed'"
-                    :captcha-type="'click_word'"
+                    :mode="'pop'"
+                    :captcha-type="'slider'"
                     :img-size="{ width: '330px', height: '155px' }"
                     @success="successVerify"
                   ></Verify>
@@ -371,27 +371,28 @@
         })
       },
       handlePhoneLogin() {
-        this.$refs.phoneLoginForm.validate((valid) => {
-          console.log(this.phoneLoginForm)
-          if (valid) {
-            this.loading = true
-            this.$store
-              .dispatch('user/login', this.phoneLoginForm)
-              .then(() => {
-                const routerPath =
-                  this.redirect === '/404' || this.redirect === '/401'
-                    ? '/'
-                    : this.redirect
-                this.$router.push(routerPath).catch(() => {})
-                this.loading = false
-              })
-              .catch(() => {
-                this.loading = false
-              })
-          } else {
-            return false
-          }
-        })
+        this.$refs.verify.show()
+        // this.$refs.phoneLoginForm.validate((valid) => {
+        //   console.log(this.phoneLoginForm)
+        //   if (valid) {
+        //     this.loading = true
+        //     this.$store
+        //       .dispatch('user/login', this.phoneLoginForm)
+        //       .then(() => {
+        //         const routerPath =
+        //           this.redirect === '/404' || this.redirect === '/401'
+        //             ? '/'
+        //             : this.redirect
+        //         this.$router.push(routerPath).catch(() => {})
+        //         this.loading = false
+        //       })
+        //       .catch(() => {
+        //         this.loading = false
+        //       })
+        //   } else {
+        //     return false
+        //   }
+        // })
       },
       handleSocialLogin(providerId) {
         const url = this.socialAuthorizationUrl + providerId

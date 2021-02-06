@@ -15,7 +15,7 @@
           style="width: 100%; height: 100%; display: block"
         />
         <div v-show="showRefresh" class="verify-refresh" @click="refresh">
-          <i class="iconfont icon-refresh"></i>
+          <i class="iconfont icon-refresh" />
         </div>
         <transition name="tips">
           <span
@@ -312,7 +312,7 @@
         this.endMovetime = +new Date()
         var _this = this
         //判断是否重合
-        if (this.status && this.isEnd == false) {
+        if (this.status && this.isEnd === false) {
           var moveLeftDistance = parseInt(
             (this.moveBlockLeft || '').replace('px', '')
           )
