@@ -16,7 +16,7 @@
           style="z-index: 3"
           @click="refresh"
         >
-          <i class="iconfont icon-refresh"></i>
+          <vab-colorful-icon :icon-class="'refresh'" />
         </div>
         <img
           ref="canvas"
@@ -252,7 +252,6 @@
           captchaType: this.captchaType,
         }
         reqGet(data).then((res) => {
-          console.log(res)
           if (res.code === 901) {
             this.pointBackImgBase = res.data.background
             this.backToken = res.data.token

@@ -15,13 +15,13 @@
           style="width: 100%; height: 100%; display: block"
         />
         <div v-show="showRefresh" class="verify-refresh" @click="refresh">
-          <i class="iconfont icon-refresh" />
+          <vab-colorful-icon :icon-class="'refresh'" />
         </div>
         <transition name="tips">
           <span
             v-if="tipWords"
             class="verify-tips"
-            :class="passFlag ? 'suc-bg' : 'err-bg'"
+            :class="passFlag ? 'success-bg' : 'error-bg'"
           >
             {{ tipWords }}
           </span>
@@ -47,7 +47,6 @@
           transaction: transitionWidth,
         }"
       >
-        <span class="verify-msg" v-text="finishText"></span>
         <div
           class="verify-move-block"
           :style="{
@@ -60,10 +59,10 @@
           @touchstart="start"
           @mousedown="start"
         >
-          <i
-            :class="['verify-icon iconfont', iconClass]"
-            :style="{ color: iconColor }"
-          ></i>
+          <vab-colorful-icon
+            :icon-class="iconClass"
+            :class-name="'slider-icon-class'"
+          />
           <div
             v-if="type === '2'"
             class="verify-sub-block"
@@ -113,7 +112,7 @@
       },
       vSpace: {
         type: Number,
-        default: 5,
+        default: 8,
       },
       explain: {
         type: String,
@@ -160,7 +159,6 @@
         slideY: '',
         tipWords: '',
         text: '',
-        finishText: '',
         setSize: {
           imgHeight: 0,
           imgWidth: 0,
@@ -175,7 +173,7 @@
         moveBlockBackgroundColor: undefined,
         leftBarBorderColor: '#ddd',
         iconColor: undefined,
-        iconClass: 'icon-right',
+        iconClass: 'right',
         status: false, //鼠标状态
         isEnd: false, //是够验证完成
         showRefresh: true,
@@ -329,12 +327,11 @@
             token: this.backToken,
           }
           reqCheck(data).then((res) => {
-            console.log(res)
             if (res.code === 901) {
               this.moveBlockBackgroundColor = '#5cb85c'
               this.leftBarBorderColor = '#5cb85c'
               this.iconColor = '#fff'
-              this.iconClass = 'icon-check'
+              this.iconClass = 'check'
               this.showRefresh = false
               this.isEnd = true
               if (this.mode === 'pop') {
@@ -367,7 +364,7 @@
               this.moveBlockBackgroundColor = '#d9534f'
               this.leftBarBorderColor = '#d9534f'
               this.iconColor = '#fff'
-              this.iconClass = 'icon-close'
+              this.iconClass = 'close'
               this.passFlag = false
               setTimeout(function () {
                 _this.refresh()
@@ -385,7 +382,6 @@
 
       refresh: function () {
         this.showRefresh = true
-        this.finishText = ''
 
         this.transitionLeft = 'left .3s'
         this.moveBlockLeft = 0
@@ -396,7 +392,7 @@
         this.leftBarBorderColor = '#ddd'
         this.moveBlockBackgroundColor = '#fff'
         this.iconColor = '#000'
-        this.iconClass = 'icon-right'
+        this.iconClass = 'right'
         this.isEnd = false
 
         this.getPictrue()
