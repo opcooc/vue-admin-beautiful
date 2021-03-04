@@ -396,8 +396,9 @@
         // })
       },
       handleSocialLogin(providerId) {
-        socialLogin(providerId).then((response) => {
-          window.open(response.data)
+        let router_path = window.location.href
+        socialLogin(providerId, router_path).then((response) => {
+          window.location.href = response.data
         })
       },
     },

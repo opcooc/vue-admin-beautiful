@@ -23,10 +23,14 @@ export async function login(data) {
   })
 }
 
-export async function socialLogin(oauthType) {
+export async function socialLogin(providerId, routeUrl) {
   return request({
-    url: '/admin/oauth/login/' + oauthType,
+    url: '/admin/oauth/social/before-bind',
     method: 'get',
+    params: {
+      source: providerId,
+      routeUrl: routeUrl,
+    },
   })
 }
 
