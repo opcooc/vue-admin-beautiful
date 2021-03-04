@@ -178,12 +178,12 @@
           setTimeout(() => {
             // var flag = this.comparePos(this.fontPos, this.checkPosArr);
             //发送后端请求
-            var captchaVerification = this.secretKey
-              ? aesEncrypt(
-                  this.backToken + '---' + JSON.stringify(this.checkPosArr),
-                  this.secretKey
-                )
-              : this.backToken + '---' + JSON.stringify(this.checkPosArr)
+            // var captchaVerification = this.secretKey
+            //   ? aesEncrypt(
+            //       this.backToken + '---' + JSON.stringify(this.checkPosArr),
+            //       this.secretKey
+            //     )
+            //   : this.backToken + '---' + JSON.stringify(this.checkPosArr)
             let data = {
               captchaType: this.captchaType,
               data: this.secretKey
@@ -192,7 +192,6 @@
               token: this.backToken,
             }
             reqCheck(data).then((res) => {
-              console.log(res)
               if (res.code === 901) {
                 this.barAreaColor = '#4cae4c'
                 this.barAreaBorderColor = '#5cb85c'
@@ -204,7 +203,7 @@
                     this.refresh()
                   }, 1500)
                 }
-                this.$parent.$emit('success', { captchaVerification })
+                this.$parent.$emit('success', res.data)
               } else {
                 this.$parent.$emit('error', this)
                 this.barAreaColor = '#d9534f'

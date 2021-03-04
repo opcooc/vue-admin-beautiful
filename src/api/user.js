@@ -34,6 +34,17 @@ export async function socialLogin(providerId, routeUrl) {
   })
 }
 
+export async function mobileLogin(mobile, autoSignUp) {
+  return request({
+    url: '/admin/oauth/mobile',
+    method: 'get',
+    params: {
+      mobile: mobile,
+      autoSignUp: autoSignUp,
+    },
+  })
+}
+
 export function getUserInfo(accessToken) {
   return request({
     url: '/userInfo',

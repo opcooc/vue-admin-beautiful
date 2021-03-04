@@ -65,7 +65,7 @@
                     <el-button
                       class="show-pwd phone-code"
                       :disabled="isGetphone"
-                      @click="getPhoneCode"
+                      @click="chickBeforeSendMobileCode"
                     >
                       {{ phoneCode }}
                     </el-button>
@@ -84,13 +84,6 @@
                   >
                     注册/登录
                   </el-button>
-                  <Verify
-                    ref="verify"
-                    :mode="'pop'"
-                    :captcha-type="'click_word'"
-                    :img-size="{ width: '350px', height: '213px' }"
-                    @success="successVerify"
-                  ></Verify>
                 </el-form>
               </el-tab-pane>
               <el-tab-pane label="密码登录" name="second">
@@ -177,6 +170,20 @@
               </div>
             </div>
           </div>
+          <Verify
+            ref="verify"
+            :mode="'pop'"
+            :captcha-type="'slider'"
+            :img-size="{ width: '350px', height: '213px' }"
+            @success="successVerify"
+          ></Verify>
+          <Verify
+            ref="verifyMobile"
+            :mode="'pop'"
+            :captcha-type="'slider'"
+            :img-size="{ width: '350px', height: '213px' }"
+            @success="sendMobileCode"
+          ></Verify>
         </div>
       </el-col>
       <el-col :xs="6" :sm="6" :md="6" :lg="6" :xl="6">
@@ -188,8 +195,8 @@
 
 <script>
   import { openWindow } from '@/utils/open-window'
-  import { socialLogin } from '@/api/user'
-  import { baseURL } from '@/config/settings'
+  import { socialLogin, mobileLogin } from '@/api/user'
+  import { reqMobileGet } from '@/api/captcha'
   import { isPassword, isPhone } from '@/utils/validate'
   import Verify from '@/components/verifition/Verify'
   import {
@@ -267,7 +274,6 @@
         passwordType: 'password',
         redirect: undefined,
         loginType: 'first',
-        socialAuthorizationUrl: baseURL + '/auth2/authorization/',
         select: '',
       }
     },
@@ -319,6 +325,29 @@
           this.$refs.password.focus()
         })
       },
+      chickBeforeSendMobileCode() {
+        this.$refs.verifyMobile.show()
+      },
+      sendMobileCode(params) {
+        if (!isPhone(this.phoneLoginForm.phone)) {
+          //this.$baseMessage('请输入手机号', 'error')
+          this.$refs['phoneLoginForm'].validateField('phone')
+          return
+        }
+        let data = {
+          captchaType: 'sms',
+          token: params.token,
+          validate: params.validate,
+          mobile: this.phoneLoginForm.phone,
+        }
+        reqMobileGet(data).then((res) => {
+          console.log('sendMobileCode log')
+          console.log(res)
+          if (res.code === 901) {
+            // this.backToken = res.data.token
+          }
+        })
+      },
       getPhoneCode() {
         if (!isPhone(this.phoneLoginForm.phone)) {
           //this.$baseMessage('请输入手机号', 'error')
@@ -342,11 +371,6 @@
       successVerify(params) {
         // params 返回的二次验证参数
         console.log(params)
-        console.log('success')
-      },
-      showVerify() {
-        //当mode="pop"时,调用组件实例的show方法显示组件
-        this.$refs.verify.show()
       },
       handleAccountLogin() {
         this.$refs.accountLoginForm.validate((valid) => {
@@ -372,6 +396,7 @@
         })
       },
       handlePhoneLogin() {
+        //当mode="pop"时,调用组件实例的show方法显示组件
         this.$refs.verify.show()
         // this.$refs.phoneLoginForm.validate((valid) => {
         //   console.log(this.phoneLoginForm)

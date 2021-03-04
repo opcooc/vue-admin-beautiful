@@ -345,20 +345,20 @@
                 (this.endMovetime - this.startMoveTime) /
                 1000
               ).toFixed(2)}s验证成功`
-              var captchaVerification = this.secretKey
-                ? aesEncrypt(
-                    this.backToken +
-                      '---' +
-                      JSON.stringify({ x: moveLeftDistance, y: 5.0 }),
-                    this.secretKey
-                  )
-                : this.backToken +
-                  '---' +
-                  JSON.stringify({ x: moveLeftDistance, y: 5.0 })
+              // var captchaVerification = this.secretKey
+              //   ? aesEncrypt(
+              //       this.backToken +
+              //         '---' +
+              //         JSON.stringify({ x: moveLeftDistance, y: 5.0 }),
+              //       this.secretKey
+              //     )
+              //   : this.backToken +
+              //     '---' +
+              //     JSON.stringify({ x: moveLeftDistance, y: 5.0 })
               setTimeout(() => {
                 this.tipWords = ''
                 this.$parent.closeBox()
-                this.$parent.$emit('success', { captchaVerification })
+                this.$parent.$emit('success', res.data)
               }, 1000)
             } else {
               this.moveBlockBackgroundColor = '#d9534f'
