@@ -23,9 +23,9 @@ export async function login(data) {
   })
 }
 
-export async function socialLogin() {
+export async function socialLogin(oauthType) {
   return request({
-    url: '/auth2/authorization/qq',
+    url: '/admin/oauth/login/' + oauthType,
     method: 'get',
   })
 }

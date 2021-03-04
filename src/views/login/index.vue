@@ -188,6 +188,7 @@
 
 <script>
   import { openWindow } from '@/utils/open-window'
+  import { socialLogin } from '@/api/user'
   import { baseURL } from '@/config/settings'
   import { isPassword, isPhone } from '@/utils/validate'
   import Verify from '@/components/verifition/Verify'
@@ -395,21 +396,9 @@
         // })
       },
       handleSocialLogin(providerId) {
-        const url = this.socialAuthorizationUrl + providerId
-        console.log(url)
-        openWindow(url, '第三方登录', 540, 540)
-        window.addEventListener('message', this.loginSocial, false)
-      },
-      loginSocial(e) {
-        const socialToken = e.data
-        if (socialToken) {
-          setTemporaryToken(socialToken)
-          this.$router.push('/register').catch(() => {})
-          this.loading = false
-          window.removeEventListener('message', this.loginSocial, false)
-        } else {
-          this.$baseMessage('第三方授权失败!', 'error')
-        }
+        socialLogin(providerId).then((response) => {
+          window.open(response.data)
+        })
       },
     },
   }
