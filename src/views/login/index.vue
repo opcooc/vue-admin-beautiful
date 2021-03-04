@@ -87,8 +87,8 @@
                   <Verify
                     ref="verify"
                     :mode="'pop'"
-                    :captcha-type="'slider'"
-                    :img-size="{ width: '330px', height: '155px' }"
+                    :captcha-type="'click_word'"
+                    :img-size="{ width: '350px', height: '213px' }"
                     @success="successVerify"
                   ></Verify>
                 </el-form>
