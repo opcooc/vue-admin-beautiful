@@ -73,7 +73,7 @@
     _code_color1,
     _code_color2,
   } from './../utils/util'
-  import { aesEncrypt } from './../utils/ase'
+  import { aesEncrypt } from '@/utils/ase'
   import { reqGet, reqCheck } from '@/api/captcha'
 
   export default {

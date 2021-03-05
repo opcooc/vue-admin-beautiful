@@ -89,7 +89,7 @@
    * VerifySlide
    * @description 滑块
    * */
-  import { aesEncrypt } from './../utils/ase'
+  import { aesEncrypt } from '@/utils/ase'
   import { resetSize } from './../utils/util'
   import { reqGet, reqCheck } from '@/api/captcha'
 

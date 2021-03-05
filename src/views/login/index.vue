@@ -194,7 +194,7 @@
 </template>
 
 <script>
-  import { openWindow } from '@/utils/open-window'
+  import { aesEncrypt } from '@/utils/ase'
   import { socialLogin, mobileLogin } from '@/api/user'
   import { reqMobileGet } from '@/api/captcha'
   import { isPassword, isPhone } from '@/utils/validate'
@@ -258,8 +258,10 @@
         },
         phoneLoginForm: {
           areaCode: '1',
-          phone: '',
+          phone: '18627985217',
           phoneCode: '',
+          token: '',
+          secretKey: '',
         },
         phoneLoginRules: {
           phone: [
@@ -341,32 +343,24 @@
           mobile: this.phoneLoginForm.phone,
         }
         reqMobileGet(data).then((res) => {
-          console.log('sendMobileCode log')
-          console.log(res)
           if (res.code === 901) {
-            // this.backToken = res.data.token
+            this.isGetphone = true
+            let n = 60
+            this.getPhoneIntval = setInterval(() => {
+              if (n > 0) {
+                n--
+                this.phoneCode = '重新获取(' + n + 's)'
+              } else {
+                this.getPhoneIntval = null
+                clearInterval(this.getPhoneIntval)
+                this.phoneCode = '获取验证码'
+                this.isGetphone = false
+              }
+            }, 1000)
+            this.phoneLoginForm.secretKey = res.data.secretKey
+            this.phoneLoginForm.token = res.data.token
           }
         })
-      },
-      getPhoneCode() {
-        if (!isPhone(this.phoneLoginForm.phone)) {
-          //this.$baseMessage('请输入手机号', 'error')
-          this.$refs['phoneLoginForm'].validateField('phone')
-          return
-        }
-        this.isGetphone = true
-        let n = 60
-        this.getPhoneIntval = setInterval(() => {
-          if (n > 0) {
-            n--
-            this.phoneCode = '重新获取(' + n + 's)'
-          } else {
-            this.getPhoneIntval = null
-            clearInterval(this.getPhoneIntval)
-            this.phoneCode = '获取验证码'
-            this.isGetphone = false
-          }
-        }, 1000)
       },
       successVerify(params) {
         // params 返回的二次验证参数
@@ -396,29 +390,35 @@
         })
       },
       handlePhoneLogin() {
-        //当mode="pop"时,调用组件实例的show方法显示组件
-        this.$refs.verify.show()
-        // this.$refs.phoneLoginForm.validate((valid) => {
-        //   console.log(this.phoneLoginForm)
-        //   if (valid) {
-        //     this.loading = true
-        //     this.$store
-        //       .dispatch('user/login', this.phoneLoginForm)
-        //       .then(() => {
-        //         const routerPath =
-        //           this.redirect === '/404' || this.redirect === '/401'
-        //             ? '/'
-        //             : this.redirect
-        //         this.$router.push(routerPath).catch(() => {})
-        //         this.loading = false
-        //       })
-        //       .catch(() => {
-        //         this.loading = false
-        //       })
-        //   } else {
-        //     return false
-        //   }
-        // })
+        this.$refs.phoneLoginForm.validate((valid) => {
+          console.log(this.phoneLoginForm)
+          if (valid) {
+            this.loading = true
+            let mobileLoginData = {
+              data: aesEncrypt(
+                this.phoneLoginForm.phoneCode,
+                this.phoneLoginForm.secretKey
+              ),
+              token: this.phoneLoginForm.token,
+              mobile: this.phoneLoginForm.phone,
+              autoSignUp: true,
+            }
+            mobileLogin(mobileLoginData)
+              .then(() => {
+                // const routerPath =
+                // this.redirect === '/404' || this.redirect === '/401'
+                //   ? '/'
+                //   : this.redirect
+                this.$router.push('/login').catch(() => {})
+                this.loading = false
+              })
+              .catch(() => {
+                this.loading = false
+              })
+          } else {
+            return false
+          }
+        })
       },
       handleSocialLogin(providerId) {
         let router_path = window.location.href

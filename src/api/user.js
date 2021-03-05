@@ -34,13 +34,15 @@ export async function socialLogin(providerId, routeUrl) {
   })
 }
 
-export async function mobileLogin(mobile, autoSignUp) {
+export async function mobileLogin(data) {
   return request({
     url: '/admin/oauth/mobile',
-    method: 'get',
+    method: 'post',
     params: {
-      mobile: mobile,
-      autoSignUp: autoSignUp,
+      data: data.data,
+      token: data.token,
+      mobile: data.mobile,
+      autoSignUp: data.autoSignUp,
     },
   })
 }
