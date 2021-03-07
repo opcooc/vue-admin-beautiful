@@ -65,7 +65,7 @@
                     <el-button
                       class="show-pwd phone-code"
                       :disabled="isGetphone"
-                      @click="chickBeforeSendMobileCode"
+                      @click="beforeSendMobileCodeChick"
                     >
                       {{ phoneCode }}
                     </el-button>
@@ -130,7 +130,7 @@
                     size="medium"
                     class="login-btn"
                     type="primary"
-                    @click="handleAccountLogin"
+                    @click="beforeAccountChick"
                   >
                     登录
                   </el-button>
@@ -176,13 +176,6 @@
             :captcha-type="'slider'"
             :img-size="{ width: '350px', height: '213px' }"
             @success="successVerify"
-          ></Verify>
-          <Verify
-            ref="verifyMobile"
-            :mode="'pop'"
-            :captcha-type="'slider'"
-            :img-size="{ width: '350px', height: '213px' }"
-            @success="sendMobileCode"
           ></Verify>
         </div>
       </el-col>
@@ -274,6 +267,7 @@
         },
         loading: false,
         passwordType: 'password',
+        verifyType: '',
         redirect: undefined,
         loginType: 'first',
         select: '',
@@ -327,8 +321,13 @@
           this.$refs.password.focus()
         })
       },
-      chickBeforeSendMobileCode() {
-        this.$refs.verifyMobile.show()
+      beforeSendMobileCodeChick() {
+        this.verifyType = 'mobileCode'
+        this.$refs.verify.show()
+      },
+      beforeAccountChick() {
+        this.verifyType = 'account'
+        this.$refs.verify.show()
       },
       sendMobileCode(params) {
         if (!isPhone(this.phoneLoginForm.phone)) {
@@ -363,12 +362,21 @@
         })
       },
       successVerify(params) {
-        // params 返回的二次验证参数
-        console.log(params)
+        if (this.verifyType === 'mobileCode') {
+          this.sendMobileCode(params)
+        }
+        switch (this.verifyType.toString()) {
+          case 'mobileCode':
+            this.sendMobileCode(params)
+            break
+          case 'account':
+            this.handleAccountLogin(params)
+            break
+        }
+        this.verifyType = ''
       },
       handleAccountLogin() {
         this.$refs.accountLoginForm.validate((valid) => {
-          console.log(this.accountLoginForm)
           if (valid) {
             this.loading = true
             this.$store
@@ -391,7 +399,6 @@
       },
       handlePhoneLogin() {
         this.$refs.phoneLoginForm.validate((valid) => {
-          console.log(this.phoneLoginForm)
           if (valid) {
             this.loading = true
             let mobileLoginData = {
@@ -403,13 +410,14 @@
               mobile: this.phoneLoginForm.phone,
               autoSignUp: true,
             }
-            mobileLogin(mobileLoginData)
+            this.$store
+              .dispatch('user/loginMobile', mobileLoginData)
               .then(() => {
-                // const routerPath =
-                // this.redirect === '/404' || this.redirect === '/401'
-                //   ? '/'
-                //   : this.redirect
-                this.$router.push('/login').catch(() => {})
+                const routerPath =
+                  this.redirect === '/404' || this.redirect === '/401'
+                    ? '/'
+                    : this.redirect
+                this.$router.push(routerPath).catch(() => {})
                 this.loading = false
               })
               .catch(() => {

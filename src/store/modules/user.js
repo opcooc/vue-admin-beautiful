@@ -4,7 +4,7 @@
  */
 
 import Vue from 'vue'
-import { getUserInfo, login, logout } from '@/api/user'
+import { getUserInfo, login, logout, mobileLogin } from '@/api/user'
 import {
   getAccessToken,
   removeAccessToken,
@@ -92,6 +92,30 @@ const actions = {
       )
     }
   },
+  async loginMobile({ commit }, mobileData) {
+    const { data } = await mobileLogin(mobileData)
+    const accessToken = data[tokenName]
+    if (accessToken) {
+      commit('setAccessToken', accessToken)
+      const hour = new Date().getHours()
+      const thisTime =
+        hour < 8
+          ? '早上好'
+          : hour <= 11
+          ? '上午好'
+          : hour <= 13
+          ? '中午好'
+          : hour < 18
+          ? '下午好'
+          : '晚上好'
+      Vue.prototype.$baseNotify(`欢迎登录${title}`, `${thisTime}！`)
+    } else {
+      Vue.prototype.$baseMessage(
+        `登录接口异常，未正确返回${socialToken}...`,
+        'error'
+      )
+    }
+  },
   async getUserInfo({ commit, state }) {
     const data = {
       permissions: ['admin'],
@@ -118,7 +142,7 @@ const actions = {
     }
   },
   async logout({ dispatch }) {
-    // await logout(state.accessToken)
+    await logout()
     await dispatch('resetAccessToken')
     await resetRouter()
   },
@@ -126,6 +150,28 @@ const actions = {
     commit('setPermissions', [])
     commit('setAccessToken', '')
     removeAccessToken()
+  },
+  async setCookieAccessToken({ commit }, accessToken) {
+    if (accessToken) {
+      commit('setAccessToken', accessToken)
+      const hour = new Date().getHours()
+      const thisTime =
+        hour < 8
+          ? '早上好'
+          : hour <= 11
+          ? '上午好'
+          : hour <= 13
+          ? '中午好'
+          : hour < 18
+          ? '下午好'
+          : '晚上好'
+      Vue.prototype.$baseNotify(`欢迎登录${title}`, `${thisTime}！`)
+    } else {
+      Vue.prototype.$baseMessage(
+        `登录接口异常，未正确返回${tokenName}...`,
+        'error'
+      )
+    }
   },
 }
 export default { state, getters, mutations, actions }

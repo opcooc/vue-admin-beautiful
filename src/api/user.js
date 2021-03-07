@@ -9,7 +9,7 @@ export async function login(data) {
   //   data = await encryptedData(data)
   // }
   return request({
-    url: '/oauth/token',
+    url: '/admin/oauth/token',
     method: 'post',
     headers: {
       Authorization: `Basic ${Base64.encode(`${clientId}:${clientSecret}`)}`,
@@ -59,7 +59,7 @@ export function getUserInfo(accessToken) {
 
 export function logout() {
   return request({
-    url: '/logout',
+    url: '/admin/oauth/logout',
     method: 'post',
   })
 }

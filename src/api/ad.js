@@ -2,8 +2,10 @@ import request from '@/utils/request'
 
 export function getList(data) {
   return request({
-    url: '/ad/getList',
+    url: '/user/get',
     method: 'get',
-    data,
+    params: {
+      id: '1367486742948536321',
+    },
   })
 }

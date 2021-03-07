@@ -76,6 +76,6 @@ const setting = {
   // 客户端id
   clientId: '6psm1qqu6266rgt7xiovoyqp',
   // 客户端密钥
-  clientSecret: '8mnr267u2w2t2s6dffai0y8b2bvi5vel',
+  clientSecret: 'n4tj9xs2wfv6h3d11073vnyvc2tftxfv',
 }
 module.exports = setting
