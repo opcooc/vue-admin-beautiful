@@ -40,7 +40,7 @@ const setting = {
   //加载时显示文字
   loadingText: '正在加载中...',
   //token名称
-  tokenName: 'accessToken',
+  tokenName: 'Authorization',
   //token在localStorage、sessionStorage存储的key的名称
   tokenTableName: 'opcooc-token',
   //token在localStorage、sessionStorage存储的key的名称

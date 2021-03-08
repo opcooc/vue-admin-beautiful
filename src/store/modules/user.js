@@ -46,7 +46,7 @@ const actions = {
   },
   async login({ commit }, userInfo) {
     const { data } = await login(userInfo)
-    const accessToken = data[tokenName]
+    const accessToken = data.accessToken
     if (accessToken) {
       commit('setAccessToken', accessToken)
       const hour = new Date().getHours()
@@ -70,7 +70,7 @@ const actions = {
   },
   async loginMobile({ commit }, mobileData) {
     const { data } = await mobileLogin(mobileData)
-    const accessToken = data[tokenName]
+    const accessToken = data.accessToken
     if (accessToken) {
       commit('setAccessToken', accessToken)
       const hour = new Date().getHours()
@@ -128,8 +128,7 @@ const actions = {
     removeAccessToken()
   },
   async loginSocial({ commit }, data) {
-    const accessToken = data[tokenName]
-    const message = data[message]
+    const accessToken = data.accessToken
     if (accessToken) {
       commit('setAccessToken', accessToken)
       const hour = new Date().getHours()
@@ -145,7 +144,7 @@ const actions = {
           : '晚上好'
       Vue.prototype.$baseNotify(`欢迎登录${title}`, `${thisTime}！`)
     } else {
-      Vue.prototype.$baseMessage(`${message}...`, 'error')
+      Vue.prototype.$baseMessage(`${data.message}...`, 'error')
     }
   },
 }
