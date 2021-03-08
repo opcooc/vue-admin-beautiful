@@ -155,15 +155,15 @@
                 社交帐号登录
               </div>
               <div style="float: right">
-                <div class="social-block" @click="handleSocialLogin('wechat')">
+                <div class="social-block" @click="beforeSocialLogin('wechat')">
                   <img src="~@/assets/login_images/wechat.png" />
                   <p>微信</p>
                 </div>
-                <div class="social-block" @click="handleSocialLogin('qq')">
+                <div class="social-block" @click="beforeSocialLogin('qq')">
                   <img src="~@/assets/login_images/qq.png" />
                   <p>QQ</p>
                 </div>
-                <div class="social-block" @click="handleSocialLogin('weibo')">
+                <div class="social-block" @click="beforeSocialLogin('weibo')">
                   <img src="~@/assets/login_images/weibo.png" />
                   <p>微博</p>
                 </div>
@@ -191,12 +191,8 @@
   import { socialLogin, mobileLogin } from '@/api/user'
   import { reqMobileGet } from '@/api/captcha'
   import { isPassword, isPhone } from '@/utils/validate'
+  import { openWindow } from '@/utils/open-window'
   import Verify from '@/components/verifition/Verify'
-  import {
-    setTemporaryToken,
-    getTemporaryToken,
-    removeTemporaryToken,
-  } from '@/utils/socialTemporaryToken'
   export default {
     name: 'Login',
     components: {
@@ -428,11 +424,30 @@
           }
         })
       },
-      handleSocialLogin(providerId) {
-        let router_path = window.location.href
-        socialLogin(providerId, router_path).then((response) => {
-          window.location.href = response.data
-        })
+      beforeSocialLogin(providerId) {
+        // let router_path = window.location.href
+        socialLogin(providerId, 'http://127.0.0.1:8899/#/socialTransit').then(
+          (response) => {
+            openWindow(response.data, '第三方登录', 540, 540)
+            window.addEventListener('message', this.afterSocialLogin, false)
+          }
+        )
+      },
+      afterSocialLogin(data) {
+        this.$store
+          .dispatch('user/loginSocial', data.data)
+          .then(() => {
+            const routerPath =
+              this.redirect === '/404' || this.redirect === '/401'
+                ? '/'
+                : this.redirect
+            this.$router.push(routerPath).catch(() => {})
+            this.loading = false
+          })
+          .catch(() => {
+            this.loading = false
+          })
+        window.removeEventListener('message', this.afterSocialLogin, false)
       },
     },
   }

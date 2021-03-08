@@ -68,30 +68,6 @@ const actions = {
       )
     }
   },
-  async loginSocial({ commit }, socialToken) {
-    const accessToken = socialToken
-    console.log('loginSocial' + accessToken)
-    if (accessToken) {
-      commit('setAccessToken', accessToken)
-      const hour = new Date().getHours()
-      const thisTime =
-        hour < 8
-          ? '早上好'
-          : hour <= 11
-          ? '上午好'
-          : hour <= 13
-          ? '中午好'
-          : hour < 18
-          ? '下午好'
-          : '晚上好'
-      Vue.prototype.$baseNotify(`欢迎登录${title}`, `${thisTime}！`)
-    } else {
-      Vue.prototype.$baseMessage(
-        `登录接口异常，未正确返回${socialToken}...`,
-        'error'
-      )
-    }
-  },
   async loginMobile({ commit }, mobileData) {
     const { data } = await mobileLogin(mobileData)
     const accessToken = data[tokenName]
@@ -151,7 +127,9 @@ const actions = {
     commit('setAccessToken', '')
     removeAccessToken()
   },
-  async setCookieAccessToken({ commit }, accessToken) {
+  async loginSocial({ commit }, data) {
+    const accessToken = data[tokenName]
+    const message = data[message]
     if (accessToken) {
       commit('setAccessToken', accessToken)
       const hour = new Date().getHours()
@@ -167,10 +145,7 @@ const actions = {
           : '晚上好'
       Vue.prototype.$baseNotify(`欢迎登录${title}`, `${thisTime}！`)
     } else {
-      Vue.prototype.$baseMessage(
-        `登录接口异常，未正确返回${tokenName}...`,
-        'error'
-      )
+      Vue.prototype.$baseMessage(`${message}...`, 'error')
     }
   },
 }

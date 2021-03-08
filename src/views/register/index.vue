@@ -260,7 +260,7 @@
         const socialToken = e.data
         if (socialToken) {
           this.$store
-            .dispatch('user/loginSocial', socialToken)
+            .dispatch('user/loginSocial1', socialToken)
             .then(() => {
               const routerPath =
                 this.redirect === '/404' || this.redirect === '/401'

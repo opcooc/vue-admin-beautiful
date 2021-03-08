@@ -17,6 +17,11 @@ export const constantRoutes = [
     hidden: true,
   },
   {
+    path: '/socialTransit',
+    component: () => import('@/views/login/SocialTransit'),
+    hidden: true,
+  },
+  {
     path: '/register',
     component: () => import('@/views/register/index'),
     hidden: true,

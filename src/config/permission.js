@@ -7,7 +7,6 @@ import store from '@/store'
 import VabProgress from 'nprogress'
 import 'nprogress/nprogress.css'
 import getPageTitle from '@/utils/pageTitle'
-import { clearTokenCookie, getTokenByCookie } from '@/utils/cookie'
 import {
   authentication,
   loginInterception,
@@ -64,14 +63,6 @@ router.beforeResolve(async (to, from, next) => {
       }
     }
   } else {
-    let cookieToken = getTokenByCookie()
-    if (cookieToken) {
-      await store.dispatch('user/setCookieAccessToken', cookieToken)
-      if (to.path === '/login') {
-        next({ path: '/' })
-        if (progressBar) VabProgress.done()
-      }
-    }
     if (routesWhiteList.indexOf(to.path) !== -1) {
       next()
     } else {
