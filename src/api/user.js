@@ -47,13 +47,10 @@ export async function mobileLogin(data) {
   })
 }
 
-export function getUserInfo(accessToken) {
+export function getUserInfo() {
   return request({
-    url: '/userInfo',
-    method: 'post',
-    data: {
-      [tokenName]: accessToken,
-    },
+    url: '/admin/auth/getUserInfo',
+    method: 'get',
   })
 }
 

@@ -358,9 +358,6 @@
         })
       },
       successVerify(params) {
-        if (this.verifyType === 'mobileCode') {
-          this.sendMobileCode(params)
-        }
         switch (this.verifyType.toString()) {
           case 'mobileCode':
             this.sendMobileCode(params)

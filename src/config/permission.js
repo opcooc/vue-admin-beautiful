@@ -9,7 +9,6 @@ import 'nprogress/nprogress.css'
 import getPageTitle from '@/utils/pageTitle'
 import {
   authentication,
-  loginInterception,
   progressBar,
   recordRoute,
   routesWhiteList,
@@ -24,9 +23,6 @@ VabProgress.configure({
 router.beforeResolve(async (to, from, next) => {
   if (progressBar) VabProgress.start()
   let hasToken = store.getters['user/accessToken']
-
-  if (!loginInterception) hasToken = true
-
   if (hasToken) {
     if (to.path === '/login') {
       next({ path: '/' })
@@ -39,15 +35,7 @@ router.beforeResolve(async (to, from, next) => {
         next()
       } else {
         try {
-          let permissions
-          if (!loginInterception) {
-            //settings.js loginInterception为false时，创建虚拟权限
-            await store.dispatch('user/setPermissions', ['admin'])
-            permissions = ['admin']
-          } else {
-            permissions = await store.dispatch('user/getUserInfo')
-          }
-
+          let permissions = await store.dispatch('user/getUserInfo')
           let accessRoutes = []
           if (authentication === 'intelligence') {
             accessRoutes = await store.dispatch('routes/setRoutes', permissions)

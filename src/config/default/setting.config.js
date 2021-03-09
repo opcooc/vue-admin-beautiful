@@ -53,8 +53,6 @@ const setting = {
   logo: 'vuejs-fill',
   //是否显示在页面高亮错误
   errorLog: ['development'],
-  //是否开启登录拦截
-  loginInterception: true,
   //是否开启登录RSA加密
   loginRSA: false,
   //intelligence和all两种方式，前者后端权限只控制permissions不控制view文件的import（前后端配合，减轻后端工作量），all方式完全交给后端前端只负责加载

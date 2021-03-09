@@ -92,26 +92,19 @@ const actions = {
       )
     }
   },
-  async getUserInfo({ commit, state }) {
-    const data = {
-      permissions: ['admin'],
-      username: 'admin',
-      'avatar|1': [
-        'https://i.gtimg.cn/club/item/face/img/2/15922_100.gif',
-        'https://i.gtimg.cn/club/item/face/img/8/15918_100.gif',
-      ],
-    }
-    // const { data } = await getUserInfo(state.accessToken)
+  async getUserInfo({ commit }) {
+    const { data } = await getUserInfo()
+    console.log(data)
     if (!data) {
       Vue.prototype.$baseMessage('验证失败，请重新登录...', 'error')
       return false
     }
-    let { permissions, username, avatar } = data
-    if (permissions && username && Array.isArray(permissions)) {
-      commit('setPermissions', permissions)
+    let { authorities, username, avatar } = data
+    if (authorities && username && Array.isArray(authorities)) {
+      commit('setPermissions', authorities)
       commit('setUsername', username)
       commit('setAvatar', avatar)
-      return permissions
+      return authorities
     } else {
       Vue.prototype.$baseMessage('用户信息接口异常', 'error')
       return false
