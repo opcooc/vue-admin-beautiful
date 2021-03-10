@@ -58,6 +58,22 @@ export const asyncRoutes = [
       },
     ],
   },
+  {
+    path: '/personalCenter',
+    component: Layout,
+    redirect: 'noRedirect',
+    hidden: true,
+    children: [
+      {
+        path: 'personalCenter',
+        name: '个人中心',
+        component: () => import('@/views/personalCenter/index'),
+        meta: {
+          title: '个人中心',
+        },
+      },
+    ],
+  },
   /* {
     path: "/test",
     component: Layout,
