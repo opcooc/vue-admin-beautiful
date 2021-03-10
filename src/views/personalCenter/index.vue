@@ -1,57 +1,60 @@
 <template>
   <div class="personalCenter-container">
     <el-tabs :tab-position="tabPosition">
-      <el-tab-pane label="我的消息">
-        <h3 class="main-title">我的消息</h3>
+      <el-tab-pane label="修改个人资料">
+        <h3 class="main-title">修改个人资料</h3>
         <div class="form-container">
           <div class="form-left-container">
             <el-form
-              ref="ruleForm"
-              :model="ruleForm"
+              ref="userInfoForm"
+              :model="userInfoForm"
               :rules="rules"
+              :label-position="labelPosition"
               label-width="100px"
-              class="demo-ruleForm"
+              class="demo-userInfoForm"
             >
-              <el-form-item label="活动名称" prop="name">
-                <el-input v-model="ruleForm.name"></el-input>
+              <el-form-item label="登录账号" prop="username">
+                <el-input
+                  v-model="userInfoForm.username"
+                  :disabled="true"
+                ></el-input>
               </el-form-item>
-              <el-form-item label="活动区域" prop="region">
-                <el-select
-                  v-model="ruleForm.region"
-                  placeholder="请选择活动区域"
-                >
-                  <el-option label="区域一" value="shanghai"></el-option>
-                  <el-option label="区域二" value="beijing"></el-option>
-                </el-select>
+              <el-form-item label="昵称" prop="nickname">
+                <el-input
+                  v-model="userInfoForm.nickname"
+                  placeholder="请输入昵称"
+                ></el-input>
               </el-form-item>
-              <el-form-item label="即时配送" prop="delivery">
-                <el-switch v-model="ruleForm.delivery"></el-switch>
+              <el-form-item label="手机号" prop="mobile">
+                <el-input
+                  v-model="userInfoForm.mobile"
+                  :disabled="true"
+                ></el-input>
               </el-form-item>
-              <el-form-item label="活动性质" prop="type">
-                <el-checkbox-group v-model="ruleForm.type">
-                  <el-checkbox
-                    label="美食/餐厅线上活动"
-                    name="type"
-                  ></el-checkbox>
-                  <el-checkbox label="地推活动" name="type"></el-checkbox>
-                  <el-checkbox label="线下主题活动" name="type"></el-checkbox>
-                  <el-checkbox label="单纯品牌曝光" name="type"></el-checkbox>
-                </el-checkbox-group>
+              <el-form-item label="邮箱" prop="email">
+                <el-input
+                  v-model="userInfoForm.email"
+                  :disabled="true"
+                ></el-input>
               </el-form-item>
-              <el-form-item label="特殊资源" prop="resource">
-                <el-radio-group v-model="ruleForm.resource">
-                  <el-radio label="线上品牌商赞助"></el-radio>
-                  <el-radio label="线下场地免费"></el-radio>
+              <el-form-item label="性别" prop="gender">
+                <el-radio-group v-model="userInfoForm.gender">
+                  <el-radio :label="0">男</el-radio>
+                  <el-radio :label="1">女</el-radio>
                 </el-radio-group>
               </el-form-item>
-              <el-form-item label="活动形式" prop="desc">
-                <el-input v-model="ruleForm.desc" type="textarea"></el-input>
+              <el-form-item label="描述" prop="description">
+                <el-input
+                  v-model="userInfoForm.description"
+                  placeholder="请输入描述"
+                  type="textarea"
+                ></el-input>
               </el-form-item>
               <el-form-item>
-                <el-button type="primary" @click="submitForm('ruleForm')">
-                  立即创建
+                <el-button type="primary" @click="submitForm('userInfoForm')">
+                  保存修改
                 </el-button>
-                <el-button @click="resetForm('ruleForm')">重置</el-button>
+                <el-button @click="resetForm('userInfoForm')">重置</el-button>
               </el-form-item>
             </el-form>
           </div>
@@ -61,15 +64,12 @@
               <div>
                 <el-avatar
                   class="user-avatar"
-                  :src="ruleForm.avatar"
+                  :src="userInfoForm.avatar"
                 ></el-avatar>
               </div>
             </div>
           </div>
         </div>
-      </el-tab-pane>
-      <el-tab-pane label="修改个人资料">
-        <h3 class="main-title">修改个人资料</h3>
       </el-tab-pane>
       <el-tab-pane label="修改登录密码">
         <h3 class="main-title">修改登录密码</h3>
@@ -91,51 +91,57 @@
 </template>
 
 <script>
+  import { getUserDetails } from '@/api/user'
+  import { mapGetters } from 'vuex'
+
   export default {
     name: 'PersonalCenter',
     data() {
       return {
         tabPosition: 'left',
-        ruleForm: {
-          name: '',
-          region: '',
-          delivery: false,
-          type: [],
-          resource: '',
-          desc: '',
+        labelPosition: 'right',
+        userInfoForm: {
+          username: '',
+          nickname: '',
+          gender: '',
+          description: '',
+          mobile: '',
+          email: '',
           avatar: '',
         },
         rules: {
-          name: [
-            { required: true, message: '请输入活动名称', trigger: 'blur' },
+          username: [
+            { required: true, message: '请输入登录账户', trigger: 'blur' },
             {
               min: 3,
-              max: 5,
-              message: '长度在 3 到 5 个字符',
+              max: 10,
+              message: '长度在 3 到 10 个字符',
               trigger: 'blur',
             },
           ],
-          region: [
-            { required: true, message: '请选择活动区域', trigger: 'change' },
-          ],
-          type: [
+          nickname: [
+            { required: true, message: '请输入昵称', trigger: 'change' },
             {
-              type: 'array',
-              required: true,
-              message: '请至少选择一个活动性质',
+              min: 3,
+              max: 10,
+              message: '长度在 3 到 8 个字符',
               trigger: 'change',
             },
           ],
-          resource: [
-            { required: true, message: '请选择活动资源', trigger: 'change' },
-          ],
-          desc: [
-            { required: true, message: '请填写活动形式', trigger: 'blur' },
+          gender: [
+            { required: true, message: '性别不能为空', trigger: 'change' },
           ],
         },
       }
     },
-    created() {},
+    computed: {
+      ...mapGetters({
+        userId: 'user/userId',
+      }),
+    },
+    created() {
+      this.getUserInfo()
+    },
     methods: {
       submitForm(formName) {
         this.$refs[formName].validate((valid) => {
@@ -149,12 +155,24 @@
       resetForm(formName) {
         this.$refs[formName].resetFields()
       },
+      getUserInfo() {
+        getUserDetails(this.userId).then((response) => {
+          this.userInfoForm.username = response.data.username
+          this.userInfoForm.nickname = response.data.nickname
+          this.userInfoForm.gender = response.data.gender
+          this.userInfoForm.description = response.data.description
+          this.userInfoForm.mobile = response.data.mobile
+          this.userInfoForm.email = response.data.email
+          this.userInfoForm.avatar = response.data.avatar
+        })
+      },
     },
   }
 </script>
 
 <style lang="scss" scoped>
   .personalCenter-container {
+    margin: 2cm 15cm 2cm 15cm;
     .main-title {
       padding: 5px 5px 10px 5px;
       margin: 5px 5px 5px 5px;
@@ -162,25 +180,18 @@
     }
     .form-container {
       display: flex;
-      .form-right-container {
+      .form-left-container {
         position: relative;
         display: inline-block;
         width: 75%;
-        padding-left: 1rem;
-        vertical-align: top;
       }
       .form-right-container {
         position: relative;
         display: inline-block;
         width: 25%;
-        padding-left: 1rem;
-        vertical-align: top;
         .user-avatar {
           width: 150px;
           height: 150px;
-          text-align: center;
-          cursor: pointer;
-          border-radius: 50%;
         }
       }
     }

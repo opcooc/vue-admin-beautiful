@@ -54,6 +54,16 @@ export function getUserInfo() {
   })
 }
 
+export function getUserDetails(id) {
+  return request({
+    url: '/user/get',
+    method: 'get',
+    params: {
+      id: id,
+    },
+  })
+}
+
 export function logout() {
   return request({
     url: '/admin/oauth/logout',
