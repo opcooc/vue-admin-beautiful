@@ -64,6 +64,14 @@ export function getUserDetails(id) {
   })
 }
 
+export function simpleUpdateUser(data) {
+  return request({
+    url: '/user/simple-update',
+    method: 'post',
+    data,
+  })
+}
+
 export function logout() {
   return request({
     url: '/admin/oauth/logout',

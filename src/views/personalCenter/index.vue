@@ -1,9 +1,9 @@
 <template>
   <div class="personalCenter-container">
     <div class="personalCenter-content-container">
-      <el-tabs :tab-position="tabPosition">
-        <el-tab-pane label="修改个人资料">
-          <h3 class="main-title">修改个人资料</h3>
+      <el-tabs :value="tabName" :tab-position="tabPosition">
+        <el-tab-pane name="information" label="个人资料">
+          <h3 class="main-title">个人资料</h3>
           <div class="form-container">
             <div class="form-left-container">
               <el-form
@@ -19,6 +19,13 @@
                     class="userInfoFormInput"
                     :disabled="true"
                   ></el-input>
+                  <el-link
+                    :underline="false"
+                    type="primary"
+                    @click="switchTab('username')"
+                  >
+                    修改登录账号
+                  </el-link>
                 </el-form-item>
                 <el-form-item label="昵称" prop="nickname">
                   <el-input
@@ -33,7 +40,11 @@
                     class="userInfoFormInput"
                     :disabled="true"
                   ></el-input>
-                  <el-link :underline="false" type="primary">
+                  <el-link
+                    :underline="false"
+                    type="primary"
+                    @click="switchTab('mobile')"
+                  >
                     修改手机号
                   </el-link>
                 </el-form-item>
@@ -43,7 +54,13 @@
                     class="userInfoFormInput"
                     :disabled="true"
                   ></el-input>
-                  <el-link :underline="false" type="primary">修改邮箱</el-link>
+                  <el-link
+                    :underline="false"
+                    type="primary"
+                    @click="switchTab('email')"
+                  >
+                    修改邮箱
+                  </el-link>
                 </el-form-item>
                 <el-form-item label="性别" prop="gender">
                   <el-radio-group v-model="userInfoForm.gender">
@@ -51,7 +68,7 @@
                     <el-radio :label="1">女</el-radio>
                   </el-radio-group>
                 </el-form-item>
-                <el-form-item label="描述" prop="description">
+                <el-form-item label="个人简介" prop="description">
                   <el-input
                     v-model="userInfoForm.description"
                     placeholder="请输入描述"
@@ -59,10 +76,12 @@
                   ></el-input>
                 </el-form-item>
                 <el-form-item>
-                  <el-button type="primary" @click="submitForm('userInfoForm')">
+                  <el-button
+                    type="primary"
+                    @click="submitUserInfoForm('userInfoForm')"
+                  >
                     保存修改
                   </el-button>
-                  <el-button @click="resetForm('userInfoForm')">重置</el-button>
                 </el-form-item>
               </el-form>
             </div>
@@ -79,20 +98,20 @@
             </div>
           </div>
         </el-tab-pane>
-        <el-tab-pane label="修改登录密码">
+        <el-tab-pane name="username" label="修改登录账号">
+          <h3 class="main-title">修改登录账号</h3>
+        </el-tab-pane>
+        <el-tab-pane name="password" label="修改登录密码">
           <h3 class="main-title">修改登录密码</h3>
         </el-tab-pane>
-        <el-tab-pane label="修改登录邮箱">
-          <h3 class="main-title">修改登录邮箱</h3>
+        <el-tab-pane name="email" label="邮箱管理">
+          <h3 class="main-title">邮箱管理</h3>
         </el-tab-pane>
-        <el-tab-pane label="邮件提醒设置">
-          <h3 class="main-title">邮件提醒设置</h3>
-        </el-tab-pane>
-        <el-tab-pane label="第三方帐号绑定">
-          <h3 class="main-title">第三方帐号绑定</h3>
-        </el-tab-pane>
-        <el-tab-pane label="手机绑定设置">
+        <el-tab-pane name="mobile" label="手机绑定设置">
           <h3 class="main-title">手机绑定设置</h3>
+        </el-tab-pane>
+        <el-tab-pane name="social" label="第三方帐号绑定">
+          <h3 class="main-title">第三方帐号绑定</h3>
         </el-tab-pane>
       </el-tabs>
     </div>
@@ -100,34 +119,35 @@
 </template>
 
 <script>
-  import { getUserDetails } from '@/api/user'
+  import { getUserDetails, simpleUpdateUser } from '@/api/user'
   import { mapGetters } from 'vuex'
 
   export default {
     name: 'PersonalCenter',
     data() {
       return {
+        tabName: 'information',
         tabPosition: 'left',
         labelPosition: 'right',
         userInfoForm: {
           username: '',
           nickname: '',
-          gender: '',
+          gender: undefined,
           description: '',
           mobile: '',
           email: '',
           avatar: '',
         },
         rules: {
-          username: [
-            { required: true, message: '请输入登录账户', trigger: 'blur' },
-            {
-              min: 3,
-              max: 10,
-              message: '长度在 3 到 10 个字符',
-              trigger: 'blur',
-            },
-          ],
+          // username: [
+          //   { required: true, message: '请输入登录账户', trigger: 'blur' },
+          //   {
+          //     min: 3,
+          //     max: 12,
+          //     message: '长度在 3 到 12 个字符',
+          //     trigger: 'blur',
+          //   },
+          // ],
           nickname: [
             { required: true, message: '请输入昵称', trigger: 'change' },
             {
@@ -152,27 +172,31 @@
       this.getUserInfo()
     },
     methods: {
-      submitForm(formName) {
+      submitUserInfoForm(formName) {
         this.$refs[formName].validate((valid) => {
           if (valid) {
-            alert('submit!')
+            let data = {
+              id: this.userId,
+              nickname: this.userInfoForm.nickname,
+              avatar: this.userInfoForm.avatar,
+              gender: this.userInfoForm.gender,
+              description: this.userInfoForm.description,
+            }
+            simpleUpdateUser(data).then(() => {
+              this.getUserInfo()
+              this.$baseMessage('修改成功', 'success')
+            })
           } else {
             return false
           }
         })
       },
-      resetForm(formName) {
-        this.$refs[formName].resetFields()
+      switchTab(tabName) {
+        this.tabName = tabName
       },
       getUserInfo() {
         getUserDetails(this.userId).then((response) => {
-          this.userInfoForm.username = response.data.username
-          this.userInfoForm.nickname = response.data.nickname
-          this.userInfoForm.gender = response.data.gender
-          this.userInfoForm.description = response.data.description
-          this.userInfoForm.mobile = response.data.mobile
-          this.userInfoForm.email = response.data.email
-          this.userInfoForm.avatar = response.data.avatar
+          this.userInfoForm = response.data
         })
       },
     },
