@@ -24,7 +24,7 @@
                   <el-form-item prop="phone">
                     <el-select
                       v-model="phoneLoginForm.areaCode"
-                      style="width: 25%"
+                      class="mobile-left-select"
                       placeholder="中国 +86"
                     >
                       <el-option label="中国 +86" value="1"></el-option>
@@ -50,7 +50,7 @@
                       placeholder=" 手机号"
                       tabindex="1"
                       maxlength="11"
-                      style="width: 75%"
+                      class="mobile-right-input"
                       show-word-limit
                       type="text"
                       autocomplete="off"
@@ -475,7 +475,14 @@
       .sign-flow-login-content {
         padding: 0 24px 20px;
         overflow: hidden;
-
+        .mobile-left-select {
+          left: 0;
+          width: 25%;
+        }
+        .mobile-right-input {
+          position: absolute;
+          width: 75%;
+        }
         .login-options {
           padding: 0 0 15px 0;
           position: relative;
@@ -523,12 +530,7 @@
           user-select: none;
         }
         .phone-code {
-          border-top-width: 0;
-          border-left-width: 0;
-          border-right-width: 0;
-          border-bottom-width: 0;
-          font-size: 15px;
-          font-weight: 500;
+          border-width: 0 0 0 0;
         }
         ::v-deep {
           /*tabs 去掉el-tab的灰色下划线*/
@@ -557,12 +559,9 @@
           .el-input__inner {
             height: 45px;
             padding: 0 0 0 0;
-            border-top-width: 0;
-            border-left-width: 0;
-            border-right-width: 0;
-            border-bottom-width: 1px;
             font-size: 15px;
             font-weight: 500;
+            border-width: 0 0 1px 0;
             border-radius: 0;
           }
         }

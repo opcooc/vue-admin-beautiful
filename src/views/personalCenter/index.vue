@@ -19,13 +19,6 @@
                     class="userInfoFormInput"
                     :disabled="true"
                   ></el-input>
-                  <el-link
-                    :underline="false"
-                    type="primary"
-                    @click="switchTab('username')"
-                  >
-                    修改登录账号
-                  </el-link>
                 </el-form-item>
                 <el-form-item label="昵称" prop="nickname">
                   <el-input
@@ -43,7 +36,7 @@
                   <el-link
                     :underline="false"
                     type="primary"
-                    @click="switchTab('mobile')"
+                    @click="switchDialog('mobile')"
                   >
                     修改手机号
                   </el-link>
@@ -57,7 +50,7 @@
                   <el-link
                     :underline="false"
                     type="primary"
-                    @click="switchTab('email')"
+                    @click="switchDialog('email')"
                   >
                     修改邮箱
                   </el-link>
@@ -98,22 +91,78 @@
             </div>
           </div>
         </el-tab-pane>
-        <el-tab-pane name="username" label="修改登录账号">
-          <h3 class="main-title">修改登录账号</h3>
-        </el-tab-pane>
-        <el-tab-pane name="password" label="修改登录密码">
-          <h3 class="main-title">修改登录密码</h3>
-        </el-tab-pane>
         <el-tab-pane name="email" label="邮箱管理">
           <h3 class="main-title">邮箱管理</h3>
-        </el-tab-pane>
-        <el-tab-pane name="mobile" label="手机绑定设置">
-          <h3 class="main-title">手机绑定设置</h3>
         </el-tab-pane>
         <el-tab-pane name="social" label="第三方帐号绑定">
           <h3 class="main-title">第三方帐号绑定</h3>
         </el-tab-pane>
       </el-tabs>
+      <el-dialog
+        :title="dialogTitle"
+        :visible.sync="centerDialogVisible"
+        width="20%"
+        destroy-on-close
+        center
+      >
+        <el-steps :active="stepActive" align-center>
+          <el-step title="身份验证"></el-step>
+          <el-step title="更换信息"></el-step>
+          <el-step title="完成"></el-step>
+        </el-steps>
+        <div class="mobile-verify-content">
+          <MobileVerify
+            v-show="chickMobile"
+            ref="verify"
+            :mobile-param="mobileParam"
+            :confirm-button-name="confirmButtonName"
+            :is-slider-verify="isSliderVerify"
+            :captcha-type="captchaType"
+            :user-id="verifyUserId"
+            :is-disabled="isDisabled"
+            :step-type="mobileVerifyStepType"
+            @success="nextStep"
+          ></MobileVerify>
+          <div v-show="bindEmail" class="bind-email-content">
+            <el-form
+              ref="updateEmailForm"
+              :model="updateEmailForm"
+              :rules="rules"
+              label-position="left"
+            >
+              <el-form-item prop="email">
+                <el-input
+                  v-model="updateEmailForm.email"
+                  placeholder="邮箱"
+                  type="text"
+                ></el-input>
+              </el-form-item>
+              <el-form-item prop="code">
+                <el-input
+                  v-model.trim="updateEmailForm.code"
+                  type="text"
+                  placeholder="请输入 6 位邮箱验证码"
+                ></el-input>
+                <el-button
+                  class="email-code"
+                  :disabled="isSend"
+                  @click="sendEmailCode"
+                >
+                  {{ emailCode }}
+                </el-button>
+              </el-form-item>
+              <el-button
+                size="medium"
+                class="login-button"
+                type="primary"
+                @click="handleBindEmail"
+              >
+                确认更换
+              </el-button>
+            </el-form>
+          </div>
+        </div>
+      </el-dialog>
     </div>
   </div>
 </template>
@@ -121,14 +170,40 @@
 <script>
   import { getUserDetails, simpleUpdateUser } from '@/api/user'
   import { mapGetters } from 'vuex'
+  import MobileVerify from '@/components/MobileVerify'
+  import { isEmail } from '@/utils/validate'
 
   export default {
     name: 'PersonalCenter',
+    components: {
+      MobileVerify,
+    },
     data() {
+      const validateEmail = (rule, value, callback) => {
+        if (!isEmail(value)) {
+          callback(new Error('请输入正确的邮箱'))
+        } else {
+          callback()
+        }
+      }
       return {
         tabName: 'information',
         tabPosition: 'left',
         labelPosition: 'right',
+        centerDialogVisible: false,
+        chickMobile: false,
+        bindMobile: false,
+        bindEmail: false,
+        isSend: false,
+        emailCode: '获取验证码',
+        mobileVerifyStepType: '',
+        confirmButtonName: '',
+        isSliderVerify: false,
+        verifyUserId: '',
+        isDisabled: true,
+        captchaType: 'slider',
+        stepActive: 1,
+        dialogTitle: '',
         userInfoForm: {
           username: '',
           nickname: '',
@@ -138,16 +213,12 @@
           email: '',
           avatar: '',
         },
+        mobileParam: '',
+        updateEmailForm: {
+          email: '',
+          code: '',
+        },
         rules: {
-          // username: [
-          //   { required: true, message: '请输入登录账户', trigger: 'blur' },
-          //   {
-          //     min: 3,
-          //     max: 12,
-          //     message: '长度在 3 到 12 个字符',
-          //     trigger: 'blur',
-          //   },
-          // ],
           nickname: [
             { required: true, message: '请输入昵称', trigger: 'change' },
             {
@@ -159,6 +230,13 @@
           ],
           gender: [
             { required: true, message: '性别不能为空', trigger: 'change' },
+          ],
+          email: [
+            { required: true, trigger: 'blur', message: '请输入邮箱' },
+            { validator: validateEmail, trigger: 'blur' },
+          ],
+          code: [
+            { required: true, trigger: 'blur', message: '请输入邮箱证码' },
           ],
         },
       }
@@ -182,17 +260,88 @@
               gender: this.userInfoForm.gender,
               description: this.userInfoForm.description,
             }
-            simpleUpdateUser(data).then(() => {
-              this.getUserInfo()
-              this.$baseMessage('修改成功', 'success')
+            simpleUpdateUser(data).then((response) => {
+              if (response.code === 901) {
+                this.getUserInfo()
+                this.$baseMessage('修改成功', 'success')
+              }
             })
           } else {
             return false
           }
         })
       },
-      switchTab(tabName) {
-        this.tabName = tabName
+      sendEmailCode(data) {
+        if (!isEmail(this.updateEmailForm.email)) {
+          this.$refs['updateEmailForm'].validateField('email')
+          return
+        }
+        // reqMobileGet(data).then((res) => {
+        //   if (res.code === 901) {
+        //     this.isSend = true
+        //     let n = res.data.expireIn
+        //     this.getPhoneIntval = setInterval(() => {
+        //       if (n > 0) {
+        //         n--
+        //         this.emailCode = '重新获取(' + n + 's)'
+        //       } else {
+        //         this.getPhoneIntval = null
+        //         clearInterval(this.getPhoneIntval)
+        //         this.emailCode = '获取验证码'
+        //         this.isSend = false
+        //       }
+        //     }, 1000)
+        //     this.phoneLoginForm.secretKey = res.data.secretKey
+        //     this.phoneLoginForm.token = res.data.token
+        //   }
+        // })
+      },
+      switchDialog(type) {
+        switch (type.toString()) {
+          case 'mobile':
+            this.dialogTitle = '修改手机号'
+            this.mobileVerifyStepType = 'preMobile'
+            break
+          case 'email':
+            this.dialogTitle = '修改邮箱'
+            this.mobileVerifyStepType = 'preEmail'
+            break
+        }
+        this.chickMobile = true
+        this.bindEmail = false
+        this.isDisabled = true
+        this.isSliderVerify = false
+        this.stepActive = 1
+        this.confirmButtonName = '验证'
+        this.verifyUserId = this.userId
+        this.mobileParam = this.userInfoForm.mobile
+        this.centerDialogVisible = true
+      },
+      nextStep(data) {
+        switch (data.stepType.toString()) {
+          case 'preMobile':
+            if (this.stepActive === 2) {
+              return this.handleBindMobile()
+            } else {
+              this.isSliderVerify = true
+            }
+            break
+          case 'preEmail':
+            this.chickMobile = false
+            this.bindEmail = true
+            break
+        }
+        this.isDisabled = false
+        this.confirmButtonName = '确认更换'
+        this.stepActive = 2
+      },
+      handleBindEmail() {
+        this.centerDialogVisible = false
+        this.getUserInfo()
+      },
+      handleBindMobile() {
+        this.centerDialogVisible = false
+        this.getUserInfo()
       },
       getUserInfo() {
         getUserDetails(this.userId).then((response) => {
@@ -212,6 +361,39 @@
     }
     .personalCenter-content-container {
       margin: 30px 20% 0 20%;
+    }
+    .mobile-verify-content {
+      margin: 5px 5% 0 5%;
+    }
+    .bind-email-content {
+      margin: 5px 5% 0 5%;
+      .login-button {
+        width: 100%;
+        margin-top: 5px;
+      }
+      .email-code {
+        position: absolute;
+        top: 6px;
+        right: 0;
+        font-size: 15px;
+        color: #175199;
+        cursor: pointer;
+        user-select: none;
+        border-width: 0 0 0 0;
+      }
+      ::v-deep {
+        .el-form {
+          padding-right: 0;
+        }
+        .el-input__inner {
+          height: 45px;
+          padding: 0 0 0 0;
+          font-size: 15px;
+          font-weight: 500;
+          border-width: 0 0 1px 0;
+          border-radius: 0;
+        }
+      }
     }
     .form-container {
       display: flex;
