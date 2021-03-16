@@ -41,7 +41,7 @@
                     修改手机号
                   </el-link>
                 </el-form-item>
-                <el-form-item label="邮箱" prop="email">
+                <el-form-item label="邮箱">
                   <el-input
                     v-model="userInfoForm.email"
                     class="userInfoFormInput"

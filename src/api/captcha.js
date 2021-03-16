@@ -38,7 +38,7 @@ export function validate(data) {
     url: '/admin/captcha/' + data.captchaType + '/validate',
     method: 'post',
     params: {
-      data: aesEncrypt(data.phoneCode, data.secretKey),
+      data: aesEncrypt(data.code, data.secretKey),
       token: data.token,
     },
   })

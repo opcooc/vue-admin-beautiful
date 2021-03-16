@@ -79,7 +79,7 @@
 <script>
   import { isBlank, isPhone } from '@/utils/validate'
   import Verify from '@/components/verifition/Verify'
-  import { reqMobileGet } from '@/api/captcha'
+  import { reqMobileGet, validate } from '@/api/captcha'
 
   export default {
     name: 'MobileVerify',
@@ -131,6 +131,7 @@
       return {
         isSend: false,
         phoneCode: '获取验证码',
+        phoneInterval: '',
         phoneLoginForm: {
           areaCode: '1',
           code: '',
@@ -138,6 +139,7 @@
           secretKey: '',
           mobile: '',
           stepType: '',
+          captchaType: '',
         },
         phoneLoginRules: {
           mobile: [
@@ -152,6 +154,9 @@
     },
     created() {
       this.phoneLoginForm.mobile = this.mobileParam
+    },
+    destroyed() {
+      clearInterval(this.phoneInterval)
     },
     methods: {
       beforeSendMobileCodeChick() {
@@ -187,15 +192,12 @@
           if (res.code === 901) {
             this.isSend = true
             let n = res.data.expireIn
-            this.getPhoneIntval = setInterval(() => {
+            this.phoneInterval = setInterval(() => {
               if (n > 0) {
                 n--
                 this.phoneCode = '重新获取(' + n + 's)'
               } else {
-                this.getPhoneIntval = null
-                clearInterval(this.getPhoneIntval)
-                this.phoneCode = '获取验证码'
-                this.isSend = false
+                this.clearInterval()
               }
             }, 1000)
             this.phoneLoginForm.secretKey = res.data.secretKey
@@ -203,11 +205,28 @@
           }
         })
       },
+      clearInterval() {
+        clearInterval(this.phoneInterval)
+        this.phoneCode = '获取验证码'
+        this.isSend = false
+      },
       handleConfirmClick() {
         this.phoneLoginForm.stepType = this.stepType
-        this.$emit('success', this.phoneLoginForm)
-        this.phoneLoginForm.mobile = ''
-        this.phoneLoginForm.code = ''
+        this.phoneLoginForm.captchaType = 'sms'
+        if (this.confirmButtonName === '验证') {
+          validate(this.phoneLoginForm).then((response) => {
+            if (response.code === 901) {
+              this.$emit('success', this.phoneLoginForm)
+              this.phoneLoginForm.mobile = ''
+              this.phoneLoginForm.code = ''
+              this.clearInterval()
+            } else {
+              return false
+            }
+          })
+        } else {
+          this.$emit('success', this.phoneLoginForm)
+        }
       },
     },
   }
