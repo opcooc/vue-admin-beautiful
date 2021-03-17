@@ -168,8 +168,9 @@
 </template>
 
 <script>
-  import { getUserDetails, simpleUpdateUser } from '@/api/user'
+  import { getUserDetails, simpleUpdateUser, updateAccount } from '@/api/user'
   import { mapGetters } from 'vuex'
+  import { aesEncrypt } from '@/utils/ase'
   import MobileVerify from '@/components/MobileVerify'
   import { isEmail } from '@/utils/validate'
 
@@ -217,6 +218,9 @@
         updateEmailForm: {
           email: '',
           code: '',
+          token: '',
+          secretKey: '',
+          captchaType: '',
         },
         rules: {
           nickname: [
@@ -317,11 +321,11 @@
         this.mobileParam = this.userInfoForm.mobile
         this.centerDialogVisible = true
       },
-      nextStep(data) {
-        switch (data.stepType.toString()) {
+      nextStep(params) {
+        switch (params.stepType.toString()) {
           case 'preMobile':
             if (this.stepActive === 2) {
-              return this.handleBindMobile()
+              return this.handleBindMobile(params)
             } else {
               this.isSliderVerify = true
             }
@@ -336,12 +340,41 @@
         this.stepActive = 2
       },
       handleBindEmail() {
-        this.centerDialogVisible = false
-        this.getUserInfo()
+        let data = {
+          account: this.updateEmailForm.email,
+          source: 'email',
+          data: aesEncrypt(
+            this.updateEmailForm.code,
+            this.updateEmailForm.secretKey
+          ),
+          token: this.updateEmailForm.email,
+          captchaType: 'email',
+        }
+        console.log(data)
+        updateAccount(data).then((response) => {
+          if (response.code === 901) {
+            this.getUserInfo()
+            this.centerDialogVisible = false
+            this.$baseMessage('修改成功', 'success')
+          }
+        })
       },
-      handleBindMobile() {
-        this.centerDialogVisible = false
-        this.getUserInfo()
+      handleBindMobile(params) {
+        let data = {
+          account: params.mobile,
+          source: 'mobile',
+          data: aesEncrypt(params.code, params.secretKey),
+          token: params.token,
+          captchaType: params.captchaType,
+        }
+        console.log(data)
+        updateAccount(data).then((response) => {
+          if (response.code === 901) {
+            this.getUserInfo()
+            this.centerDialogVisible = false
+            this.$baseMessage('修改成功', 'success')
+          }
+        })
       },
       getUserInfo() {
         getUserDetails(this.userId).then((response) => {

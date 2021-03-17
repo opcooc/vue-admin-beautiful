@@ -54,6 +54,17 @@ export function getUserInfo() {
   })
 }
 
+export function updateAccount(data) {
+  return request({
+    url: '/admin/auth/update-account',
+    method: 'get',
+    params: {
+      account: data.account,
+      source: data.source,
+    },
+  })
+}
+
 export function getUserDetails(id) {
   return request({
     url: '/user/get',
