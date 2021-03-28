@@ -117,6 +117,10 @@
         type: String,
         required: true,
       },
+      originalSize: {
+        type: Object,
+        required: true,
+      },
       imgSize: {
         type: Object,
         required: true,
@@ -290,7 +294,8 @@
           )
           console.log(moveLeftDistance)
           moveLeftDistance =
-            (moveLeftDistance * 350) / parseInt(this.setSize.imgWidth)
+            (moveLeftDistance * parseInt(this.originalSize.width)) /
+            parseInt(this.setSize.imgWidth)
           console.log(this.setSize.imgWidth)
           console.log(moveLeftDistance)
           let data = {

@@ -26,6 +26,7 @@
           :v-space="vSpace"
           :explain="explain"
           :img-size="imgSize"
+          :original-size="originalSize"
           :block-size="blockSize"
           :bar-size="barSize"
         ></components>
@@ -83,6 +84,16 @@
       explain: {
         type: String,
         default: '向右拖动滑块填充拼图',
+      },
+      //原始背景图片大小
+      originalSize: {
+        type: Object,
+        default() {
+          return {
+            width: '350px',
+            height: '213px',
+          }
+        },
       },
       //背景图片大小
       imgSize: {
