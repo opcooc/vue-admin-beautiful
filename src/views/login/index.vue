@@ -6,183 +6,255 @@
       :closable="false"
       style="position: fixed"
     ></el-alert>
-    <el-row>
-      <el-col :xs="6" :sm="6" :md="6" :lg="6" :xl="6">
-        <div style="color: transparent">占位符</div>
-      </el-col>
-      <el-col :xs="12" :sm="12" :md="12" :lg="12" :xl="12">
-        <div class="sign-container-content">
-          <div class="sign-flow-login-content">
-            <el-tabs v-model="loginType" @tab-click="handleClick">
-              <el-tab-pane label="免密码登录" name="first">
-                <el-form
-                  ref="phoneLoginForm"
-                  :model="phoneLoginForm"
-                  :rules="phoneLoginRules"
-                  label-position="left"
+    <Particles
+      id="particles"
+      class="login-container-particles"
+      :options="{
+        fpsLimit: 60,
+        interactivity: {
+          detectsOn: 'canvas',
+          events: {
+            onClick: {
+              enable: true,
+              mode: 'push',
+            },
+            onHover: {
+              enable: true,
+              mode: 'grab',
+            },
+            resize: true,
+          },
+        },
+        particles: {
+          color: {
+            value: '#fff',
+          },
+          links: {
+            color: '#fff',
+            distance: 150,
+            enable: true,
+            opacity: 0.4,
+            width: 1,
+          },
+          collisions: {
+            enable: true,
+          },
+          move: {
+            direction: 'none',
+            enable: true,
+            outMode: 'bounce',
+            random: false,
+            speed: 2,
+            straight: false,
+            out_mode: 'out',
+            bounce: false,
+            attract: {
+              enable: false,
+              rotateX: 600,
+              rotateY: 1200,
+            },
+          },
+          number: {
+            density: {
+              enable: true,
+              value_area: 800,
+            },
+            value: 60,
+          },
+          opacity: {
+            value: 0.7,
+            random: false,
+            anim: {
+              enable: false,
+              speed: 1,
+              opacity_min: 0.1,
+              sync: false,
+            },
+          },
+          shape: {
+            type: 'circle',
+          },
+          size: {
+            random: true,
+            value: 4,
+            anim: {
+              enable: false,
+              speed: 40,
+              size_min: 0.1,
+              sync: false,
+            },
+          },
+        },
+        retina_detect: false,
+      }"
+    />
+    <div class="sign-container-content">
+      <div class="sign-container-content-top"></div>
+      <div class="sign-flow-login-content">
+        <el-tabs v-model="loginType" @tab-click="handleClick">
+          <el-tab-pane label="免密登录" name="first">
+            <el-form
+              ref="phoneLoginForm"
+              :model="phoneLoginForm"
+              :rules="phoneLoginRules"
+              label-position="left"
+            >
+              <el-form-item prop="phone">
+                <el-select
+                  v-model="phoneLoginForm.areaCode"
+                  class="mobile-left-select"
+                  placeholder="中国 +86"
                 >
-                  <el-form-item prop="phone">
-                    <el-select
-                      v-model="phoneLoginForm.areaCode"
-                      class="mobile-left-select"
-                      placeholder="中国 +86"
-                    >
-                      <el-option label="中国 +86" value="1"></el-option>
-                      <el-option label="中国香港 +852" value="2"></el-option>
-                      <el-option label="中国澳门 +853" value="3"></el-option>
-                      <el-option label="中国台湾 +886" value="4"></el-option>
-                      <el-option label="美国 +1" value="5"></el-option>
-                      <el-option label="日本 +81" value="6"></el-option>
-                      <el-option label="马来西亚 +60" value="7"></el-option>
-                      <el-option label="澳大利亚 +61" value="8"></el-option>
-                      <el-option label="加拿大 +1" value="9"></el-option>
-                      <el-option label="英国 +44" value="10"></el-option>
-                      <el-option label="新加坡 +65" value="11"></el-option>
-                      <el-option label="德国 +49" value="12"></el-option>
-                      <el-option label="俄罗斯 +7" value="13"></el-option>
-                      <el-option label="埃及 +20" value="14"></el-option>
-                      <el-option label="南非 +27" value="15"></el-option>
-                      <el-option label="希腊 +30" value="16"></el-option>
-                      <el-option label="荷兰 +31" value="17"></el-option>
-                    </el-select>
-                    <el-input
-                      v-model.trim="phoneLoginForm.phone"
-                      placeholder=" 手机号"
-                      tabindex="1"
-                      maxlength="11"
-                      class="mobile-right-input"
-                      show-word-limit
-                      type="text"
-                      autocomplete="off"
-                    ></el-input>
-                  </el-form-item>
-                  <el-form-item prop="phoneCode" style="position: relative">
-                    <el-input
-                      v-model.trim="phoneLoginForm.phoneCode"
-                      type="text"
-                      placeholder="请输入 6 位短信验证码"
-                    ></el-input>
-                    <el-button
-                      class="show-pwd phone-code"
-                      :disabled="isGetphone"
-                      @click="beforeSendMobileCodeChick"
-                    >
-                      {{ phoneCode }}
-                    </el-button>
-                  </el-form-item>
-                  <div class="login-options">
-                    <el-link type="info" :underline="false">
-                      接收语音验证码?
-                    </el-link>
-                  </div>
-                  <el-button
-                    :loading="loading"
-                    size="medium"
-                    class="login-btn"
-                    type="primary"
-                    @click="handlePhoneLogin"
-                  >
-                    注册/登录
-                  </el-button>
-                </el-form>
-              </el-tab-pane>
-              <el-tab-pane label="密码登录" name="second">
-                <el-form
-                  ref="accountLoginForm"
-                  :model="accountLoginForm"
-                  :rules="accountLoginRules"
-                  label-position="left"
+                  <el-option label="中国 +86" value="1"></el-option>
+                  <el-option label="中国香港 +852" value="2"></el-option>
+                  <el-option label="中国澳门 +853" value="3"></el-option>
+                  <el-option label="中国台湾 +886" value="4"></el-option>
+                  <el-option label="美国 +1" value="5"></el-option>
+                  <el-option label="日本 +81" value="6"></el-option>
+                  <el-option label="马来西亚 +60" value="7"></el-option>
+                  <el-option label="澳大利亚 +61" value="8"></el-option>
+                  <el-option label="加拿大 +1" value="9"></el-option>
+                  <el-option label="英国 +44" value="10"></el-option>
+                  <el-option label="新加坡 +65" value="11"></el-option>
+                  <el-option label="德国 +49" value="12"></el-option>
+                  <el-option label="俄罗斯 +7" value="13"></el-option>
+                  <el-option label="埃及 +20" value="14"></el-option>
+                  <el-option label="南非 +27" value="15"></el-option>
+                  <el-option label="希腊 +30" value="16"></el-option>
+                  <el-option label="荷兰 +31" value="17"></el-option>
+                </el-select>
+                <el-input
+                  v-model.trim="phoneLoginForm.phone"
+                  placeholder=" 手机号"
+                  tabindex="1"
+                  maxlength="11"
+                  class="mobile-right-input"
+                  show-word-limit
+                  type="text"
+                  autocomplete="off"
+                ></el-input>
+              </el-form-item>
+              <el-form-item prop="phoneCode" style="position: relative">
+                <el-input
+                  v-model.trim="phoneLoginForm.phoneCode"
+                  type="text"
+                  placeholder="请输入 6 位短信验证码"
+                ></el-input>
+                <el-button
+                  class="show-pwd phone-code"
+                  :disabled="isGetphone"
+                  @click="beforeSendMobileCodeChick"
                 >
-                  <el-form-item prop="username">
-                    <el-input
-                      v-model.trim="accountLoginForm.username"
-                      placeholder="手机号或邮箱"
-                      tabindex="1"
-                      type="text"
-                    />
-                  </el-form-item>
-                  <el-form-item prop="password">
-                    <el-input
-                      :key="passwordType"
-                      ref="password"
-                      v-model.trim="accountLoginForm.password"
-                      :type="passwordType"
-                      tabindex="2"
-                      placeholder="密码"
-                      @keyup.enter.native="handleAccountLogin"
-                    />
-                    <span
-                      v-if="passwordType === 'password'"
-                      class="show-password"
-                      @click="handlePassword"
-                    >
-                      <vab-icon :icon="['fas', 'eye-slash']"></vab-icon>
-                    </span>
-                    <span v-else class="show-password" @click="handlePassword">
-                      <vab-icon :icon="['fas', 'eye']"></vab-icon>
-                    </span>
-                  </el-form-item>
-                  <div class="login-options">
-                    <el-link type="info" :underline="false">忘记密码?</el-link>
-                  </div>
-                  <el-button
-                    :loading="loading"
-                    size="medium"
-                    class="login-btn"
-                    type="primary"
-                    @click="beforeAccountChick"
-                  >
-                    登录
-                  </el-button>
-                </el-form>
-              </el-tab-pane>
-            </el-tabs>
-            <div class="sign-container-tip">
-              <span>未注册手机验证后自动登录，注册即代表同意</span>
-              <el-link type="info" :underline="false">《xxx协议》</el-link>
-              <el-link type="info" :underline="false">《隐私保护指引》</el-link>
-            </div>
-            <div class="form-social-line"></div>
-            <div class="social-login">
-              <div
-                style="
-                  float: left;
-                  height: 44px;
-                  display: flex;
-                  align-items: center;
-                "
+                  {{ phoneCode }}
+                </el-button>
+              </el-form-item>
+              <div class="login-options">
+                <el-link type="info" :underline="false">
+                  接收语音验证码?
+                </el-link>
+              </div>
+              <el-button
+                :loading="loading"
+                size="medium"
+                class="login-btn"
+                type="primary"
+                @click="handlePhoneLogin"
               >
-                社交帐号登录
+                注册/登录
+              </el-button>
+            </el-form>
+          </el-tab-pane>
+          <el-tab-pane label="密码登录" name="second">
+            <el-form
+              ref="accountLoginForm"
+              :model="accountLoginForm"
+              :rules="accountLoginRules"
+              label-position="left"
+            >
+              <el-form-item prop="username">
+                <el-input
+                  v-model.trim="accountLoginForm.username"
+                  placeholder="手机号或邮箱"
+                  tabindex="1"
+                  type="text"
+                />
+              </el-form-item>
+              <el-form-item prop="password">
+                <el-input
+                  :key="passwordType"
+                  ref="password"
+                  v-model.trim="accountLoginForm.password"
+                  :type="passwordType"
+                  tabindex="2"
+                  placeholder="密码"
+                  @keyup.enter.native="handleAccountLogin"
+                />
+                <span
+                  v-if="passwordType === 'password'"
+                  class="show-password"
+                  @click="handlePassword"
+                >
+                  <vab-icon :icon="['fas', 'eye-slash']"></vab-icon>
+                </span>
+                <span v-else class="show-password" @click="handlePassword">
+                  <vab-icon :icon="['fas', 'eye']"></vab-icon>
+                </span>
+              </el-form-item>
+              <div class="login-options">
+                <el-link type="info" :underline="false">忘记密码?</el-link>
               </div>
-              <div style="float: right">
-                <div class="social-block" @click="beforeSocialLogin('wechat')">
-                  <img src="~@/assets/login_images/wechat.png" />
-                  <p>微信</p>
-                </div>
-                <div class="social-block" @click="beforeSocialLogin('qq')">
-                  <img src="~@/assets/login_images/qq.png" />
-                  <p>QQ</p>
-                </div>
-                <div class="social-block" @click="beforeSocialLogin('weibo')">
-                  <img src="~@/assets/login_images/weibo.png" />
-                  <p>微博</p>
-                </div>
-              </div>
+              <el-button
+                :loading="loading"
+                size="medium"
+                class="login-btn"
+                type="primary"
+                @click="beforeAccountChick"
+              >
+                登录
+              </el-button>
+            </el-form>
+          </el-tab-pane>
+        </el-tabs>
+        <div class="sign-container-tip">
+          <span>未注册手机验证后自动登录，注册即代表同意</span>
+          <el-link type="info" :underline="false">《xxx协议》</el-link>
+          <el-link type="info" :underline="false">《隐私保护指引》</el-link>
+        </div>
+        <div class="form-social-line"></div>
+        <div class="social-login">
+          <div
+            style="
+              float: left;
+              height: 44px;
+              display: flex;
+              align-items: center;
+            "
+          >
+            社交帐号登录
+          </div>
+          <div style="float: right">
+            <div class="social-block" @click="beforeSocialLogin('wechat')">
+              <img src="~@/assets/login_images/wechat.png" />
+              <p>微信</p>
+            </div>
+            <div class="social-block" @click="beforeSocialLogin('qq')">
+              <img src="~@/assets/login_images/qq.png" />
+              <p>QQ</p>
+            </div>
+            <div class="social-block" @click="beforeSocialLogin('weibo')">
+              <img src="~@/assets/login_images/weibo.png" />
+              <p>微博</p>
             </div>
           </div>
-          <Verify
-            ref="verify"
-            :mode="'pop'"
-            :captcha-type="'slider'"
-            :img-size="{ width: '350px', height: '213px' }"
-            @success="successVerify"
-          ></Verify>
         </div>
-      </el-col>
-      <el-col :xs="6" :sm="6" :md="6" :lg="6" :xl="6">
-        <div style="color: transparent">占位符</div>
-      </el-col>
-    </el-row>
+      </div>
+      <div class="sign-container-content-footer">Copyright © 2021 opcooc</div>
+      <Verify
+        ref="verify"
+        :captcha-type="'slider'"
+        @success="successVerify"
+      ></Verify>
+    </div>
   </div>
 </template>
 
@@ -452,29 +524,59 @@
 
 <style lang="scss" scoped>
   .login-container {
-    height: 100vh;
-    background: url('~@/assets/login_images/bg.png') center center fixed
-      no-repeat;
+    position: absolute;
+    width: 100%;
+    min-height: 100%;
+    background-image: url('~@/assets/login_images/login_background.jpg');
+    background-repeat: no-repeat;
+    background-position: center 0;
     background-size: cover;
+    background-attachment: fixed;
 
-    .login-btn {
+    .login-container-particles {
+      position: absolute;
       width: 100%;
-      margin-top: 15px;
+      min-height: 100%;
     }
 
     /* sign-tab登录标签 */
     .sign-container-content {
-      position: relative;
-      max-width: 50%;
-      margin: calc((100vh - 500px) / 2) calc((100vh - 400px) / 2)
-        calc((100vh - 500px) / 2) calc((100vh - 400px) / 2);
-      overflow: hidden;
-      background-color: #fff;
+      width: 440px;
+      min-width: 300px;
+      margin: 0 auto;
+      padding: 300px 0 144px;
       border-radius: 2px;
-
+      .sign-container-content-top {
+        width: 440px;
+        height: 40px;
+        text-align: center;
+      }
+      .sign-container-content-footer {
+        position: fixed;
+        bottom: 20px;
+        width: 440px;
+        height: 40px;
+        font-size: 16px;
+        color: #175199;
+        text-align: center;
+      }
       .sign-flow-login-content {
-        padding: 0 24px 20px;
+        background-color: #fff;
+        padding: 10px 20px 20px 20px;
         overflow: hidden;
+        .login-btn {
+          width: 100%;
+          margin-top: 15px;
+        }
+        .show-password {
+          position: absolute;
+          top: 5px;
+          right: 1px;
+          font-size: 18px;
+          color: #8590a6;
+          cursor: pointer;
+          user-select: none;
+        }
         .mobile-left-select {
           left: 0;
           width: 25%;
@@ -566,16 +668,6 @@
           }
         }
       }
-    }
-
-    .show-password {
-      position: absolute;
-      top: 5px;
-      right: 1px;
-      font-size: 18px;
-      color: #8590a6;
-      cursor: pointer;
-      user-select: none;
     }
   }
 </style>

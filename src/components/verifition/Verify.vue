@@ -1,8 +1,12 @@
 <template>
-  <div v-show="showBox" :class="mode === 'pop' ? 'mask' : ''">
+  <div
+    v-show="showBox"
+    :class="mode === 'pop' ? 'mask' : ''"
+    style="display: block"
+  >
     <div
       :class="mode === 'pop' ? 'verifybox' : ''"
-      :style="{ 'max-width': parseInt(imgSize.width) + 30 + 'px' }"
+      :style="{ width: parseInt(imgSize.width) + 20 + 'px' }"
     >
       <div v-if="mode === 'pop'" class="verifybox-top">
         请完成安全验证
@@ -10,10 +14,7 @@
           <vab-colorful-icon :icon-class="'close'" />
         </span>
       </div>
-      <div
-        class="verifybox-bottom"
-        :style="{ padding: mode === 'pop' ? '15px' : '0' }"
-      >
+      <div class="verifybox-content">
         <!-- 验证码容器 -->
         <components
           :is="componentType"
@@ -38,12 +39,14 @@
    * @description 分发验证码使用
    * */
   import VerifySlide from './Verify/VerifySlide'
+  import VerifySlide2 from './Verify/VerifySlide2'
   import VerifyPoints from './Verify/VerifyPoints'
 
   export default {
     name: 'Vue2Verify',
     components: {
       VerifySlide,
+      VerifySlide2,
       VerifyPoints,
     },
     props: {
@@ -71,30 +74,45 @@
         type: String,
         default: 'pop',
       },
-      //验证码图片和移动条容器的间隔，默认单位是px。如：间隔为5px，默认:vSpace:5
+      //验证码图片和移动条容器的间隔，默认单位是px。如：间隔为10px，默认:vSpace:10
       vSpace: {
         type: Number,
-        default: undefined,
+        default: 10,
       },
       // 滑动条内的提示，不设置默认是：'向右滑动完成验证'
       explain: {
         type: String,
-        default: undefined,
+        default: '向右拖动滑块填充拼图',
       },
       //背景图片大小
       imgSize: {
         type: Object,
-        default: undefined,
+        default() {
+          return {
+            width: '280px',
+            height: '140px',
+          }
+        },
       },
       //滑动验证码的滑块大小
       blockSize: {
         type: Object,
-        default: undefined,
+        default() {
+          return {
+            width: '59px',
+            height: '40px',
+          }
+        },
       },
       //移动条容器大小
       barSize: {
         type: Object,
-        default: undefined,
+        default() {
+          return {
+            width: '280px',
+            height: '40px',
+          }
+        },
       },
     },
     data() {
@@ -125,7 +143,7 @@
           switch (captchaType.toString()) {
             case 'slider':
               this.verifyType = '2'
-              this.componentType = 'VerifySlide'
+              this.componentType = 'VerifySlide2'
               break
             case 'click_word':
               this.verifyType = ''
@@ -175,168 +193,166 @@
   }
 </script>
 <style>
+  /*弹框基础样式*/
+  .mask {
+    cursor: auto;
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: auto;
+    height: 100%;
+    background-color: rgba(0, 0, 0, 0.6);
+    z-index: 1001;
+    transition: all 0.5s;
+  }
+  /*弹框样式*/
   .verifybox {
     position: relative;
-    box-sizing: border-box;
     border-radius: 2px;
-    border: 1px solid #e4e7eb;
     background-color: #fff;
-    box-shadow: 0 0 10px rgba(0, 0, 0, 0.3);
-    left: 50%;
-    top: 50%;
-    transform: translate(-50%, -50%);
+    margin: 300px auto 0 auto;
   }
+  /*弹框顶部描述样式*/
   .verifybox-top {
-    padding: 0 15px;
-    height: 50px;
-    line-height: 50px;
+    padding: 10px;
+    margin: 0 auto;
     text-align: left;
+    font-weight: 400;
     font-size: 16px;
     border-bottom: 1px solid #e4e7eb;
     box-sizing: border-box;
   }
-  .verifybox-bottom {
-    padding: 15px;
-    box-sizing: border-box;
-  }
+  /*关闭弹框样式*/
   .verifybox-close {
     position: absolute;
     right: 0;
-    padding: 0 15px;
+    margin: 0 auto;
+    padding: 0 10px;
     font-size: 16px;
+    font-weight: 400;
     text-align: center;
     cursor: pointer;
   }
-  .mask {
-    position: fixed;
+  /*弹框内容样式*/
+  .verifybox-content {
+    padding: 10px;
+    box-sizing: content-box;
+  }
+  .verify-img-container {
+    position: relative;
+  }
+  /*滑块背景样式*/
+  .verify-slider-bg {
+    max-width: initial;
+    object-fit: fill;
+  }
+  /*滑块样式*/
+  .verify-slider-front {
+    position: absolute;
+    display: block;
     top: 0;
     left: 0;
-    z-index: 1001;
-    width: 100%;
-    height: 100vh;
-    transition: all 0.5s;
+    height: 100%;
+    width: auto;
+    object-fit: fill;
+  }
+  /*刷新按钮*/
+  .verify-refresh {
+    position: absolute;
+    display: block;
+    pointer-events: auto;
+    cursor: pointer;
+    top: 10px;
+    right: 10px;
+    width: 30px;
+    height: 30px;
+    transition: 200ms;
+    background-image: url('~@/assets/refresh.png');
+    background-size: cover;
   }
   .verify-tips {
     position: absolute;
     left: 0;
     bottom: 0;
     width: 100%;
-    height: 30px;
+    height: 100%;
     line-height: 30px;
-    color: #fff;
+    white-space: nowrap;
+    overflow: hidden;
+    padding-left: 20px;
+    color: #88949d;
   }
+  /*验证码过渡成功动画*/
   .success-bg {
     background-color: rgba(92, 184, 92, 0.5);
     filter: progid:DXImageTransform.Microsoft.gradient(startcolorstr=#7f5CB85C, endcolorstr=#7f5CB85C);
   }
+  /*验证码过渡失败动画*/
   .error-bg {
     background-color: rgba(217, 83, 79, 0.5);
     filter: progid:DXImageTransform.Microsoft.gradient(startcolorstr=#7fD9534F, endcolorstr=#7fD9534F);
   }
-  .tips-enter,
-  .tips-leave-to {
+  /*验证码过渡动画*/
+  .slider-tip-enter,
+  .slider-tip-leave-to {
     bottom: -30px;
   }
-  .tips-enter-active,
-  .tips-leave-active {
+  /*验证码过渡动画*/
+  .slider-tip-enter-active,
+  .slider-tip-leave-active {
     transition: bottom 0.5s;
+  }
+  /*滑动验证码滑块区域*/
+  .verify-slider-area {
+    position: relative;
+    text-align: center;
+    margin-top: 10px;
+    background: #f7f9fa;
+    height: 40px;
+    left: 0;
+    line-height: 40px;
+    font-weight: 300;
+    cursor: default;
+    border: 1px solid #e3e7eb;
+    border-radius: 2px;
+  }
+  /*滑块移动条样式*/
+  .verify-msg {
+    font-size: 14px;
+    overflow: hidden;
+    color: #88949d;
+  }
+  /*滑动验证码滑块*/
+  .verify-slider-left-bar {
+    position: absolute;
+    top: 0;
+    left: 0;
+    background-color: #92e6fa;
+  }
+  /*滑块内容颜色*/
+  .verify-slider-left-bar-sign {
+    position: relative;
+    color: #03b703;
+  }
+  .verify-move-block {
+    position: absolute;
+    top: 0;
+    left: 0;
+    background-color: #ffffff;
+    box-sizing: border-box;
+    cursor: move;
+    border-radius: 2px;
+    font-weight: bold;
+    box-shadow: 0 0 3px #888888;
+  }
+  .verify-sub-block {
+    text-align: center;
+    z-index: 3;
+    /* border: 1px solid #fff; */
   }
   /* ---------------------------- */
   /*常规验证码*/
-  .verify-code {
-    font-size: 20px;
-    text-align: center;
-    cursor: pointer;
-    margin-bottom: 5px;
-    border: 1px solid #ddd;
-  }
-
-  .cerify-code-panel {
-    height: 100%;
-    overflow: hidden;
-  }
-
-  .verify-code-area {
-    float: left;
-  }
-
-  .verify-input-area {
-    float: left;
-    width: 60%;
-    padding-right: 10px;
-  }
-
-  .verify-change-area {
-    line-height: 30px;
-    float: left;
-  }
-
-  .varify-input-code {
-    display: inline-block;
-    width: 100%;
-    height: 25px;
-  }
-
-  .verify-change-code {
-    color: #337ab7;
-    cursor: pointer;
-  }
-
-  .verify-btn {
-    width: 200px;
-    height: 30px;
-    background-color: #337ab7;
-    color: #ffffff;
-    border: none;
-    margin-top: 10px;
-  }
-  .slider-icon-class {
-    font-size: 20px;
-    text-align: center;
-  }
-
-  /*滑动验证码*/
-  .verify-bar-area {
-    position: relative;
-    background: #ffffff;
-    text-align: center;
-    -webkit-box-sizing: content-box;
-    -moz-box-sizing: content-box;
-    box-sizing: content-box;
-    border: 1px solid #ddd;
-    -webkit-border-radius: 4px;
-  }
-
-  .verify-bar-area .verify-move-block {
-    position: absolute;
-    top: 0px;
-    left: 0;
-    background: #fff;
-    cursor: pointer;
-    -webkit-box-sizing: content-box;
-    -moz-box-sizing: content-box;
-    box-sizing: content-box;
-    box-shadow: 0 0 2px #888888;
-    -webkit-border-radius: 1px;
-  }
-
-  .verify-bar-area .verify-move-block:hover {
-    background-color: #337ab7;
-    color: #ffffff;
-  }
-
-  .verify-bar-area .verify-left-bar {
-    position: absolute;
-    top: -1px;
-    left: -1px;
-    background: #f0fff0;
-    cursor: pointer;
-    -webkit-box-sizing: content-box;
-    -moz-box-sizing: content-box;
-    box-sizing: content-box;
-    border: 1px solid #ddd;
-  }
-
   .verify-img-panel {
     margin: 0;
     -webkit-box-sizing: content-box;
@@ -348,7 +364,7 @@
     position: relative;
   }
 
-  .verify-img-panel .verify-refresh {
+  .verify-img-panel {
     width: 25px;
     height: 25px;
     text-align: center;
@@ -371,20 +387,5 @@
     position: relative;
     z-index: 2;
     border: 1px solid #fff;
-  }
-
-  .verify-bar-area .verify-move-block .verify-sub-block {
-    position: absolute;
-    text-align: center;
-    z-index: 3;
-    /* border: 1px solid #fff; */
-  }
-
-  .verify-bar-area .verify-move-block .verify-icon {
-    font-size: 18px;
-  }
-
-  .verify-bar-area .verify-msg {
-    z-index: 3;
   }
 </style>

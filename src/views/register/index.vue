@@ -283,9 +283,10 @@
 
 <style lang="scss" scoped>
   .login-container {
-    height: 100vh;
-    background: url('~@/assets/login_images/bg.png') center center fixed
-      no-repeat;
+    width: 100%;
+    max-width: 100%;
+    background: url('~@/assets/login_images/login_background.jpg') center center
+      fixed no-repeat;
     background-size: cover;
 
     .login-btn {
