@@ -6,88 +6,6 @@
       :closable="false"
       style="position: fixed"
     ></el-alert>
-    <Particles
-      id="particles"
-      class="login-container-particles"
-      :options="{
-        fpsLimit: 60,
-        interactivity: {
-          detectsOn: 'canvas',
-          events: {
-            onClick: {
-              enable: true,
-              mode: 'push',
-            },
-            onHover: {
-              enable: true,
-              mode: 'grab',
-            },
-            resize: true,
-          },
-        },
-        particles: {
-          color: {
-            value: '#fff',
-          },
-          links: {
-            color: '#fff',
-            distance: 150,
-            enable: true,
-            opacity: 0.4,
-            width: 1,
-          },
-          collisions: {
-            enable: true,
-          },
-          move: {
-            direction: 'none',
-            enable: true,
-            outMode: 'bounce',
-            random: false,
-            speed: 2,
-            straight: false,
-            out_mode: 'out',
-            bounce: false,
-            attract: {
-              enable: false,
-              rotateX: 600,
-              rotateY: 1200,
-            },
-          },
-          number: {
-            density: {
-              enable: true,
-              value_area: 800,
-            },
-            value: 60,
-          },
-          opacity: {
-            value: 0.7,
-            random: false,
-            anim: {
-              enable: false,
-              speed: 1,
-              opacity_min: 0.1,
-              sync: false,
-            },
-          },
-          shape: {
-            type: 'circle',
-          },
-          size: {
-            random: true,
-            value: 4,
-            anim: {
-              enable: false,
-              speed: 40,
-              size_min: 0.1,
-              sync: false,
-            },
-          },
-        },
-        retina_detect: false,
-      }"
-    />
     <div class="sign-container-content">
       <div class="sign-container-content-top"></div>
       <div class="sign-flow-login-content">
@@ -254,21 +172,37 @@
         :captcha-type="'slider'"
         @success="successVerify"
       ></Verify>
+      <el-dialog
+        title="绑定手机号"
+        :visible.sync="centerDialogVisible"
+        width="20%"
+        :show-close="false"
+        :close-on-click-modal="false"
+        :close-on-press-escape="false"
+        destroy-on-close
+        center
+      >
+        <after-bind :after-bind="afterBindingAccount"></after-bind>
+      </el-dialog>
     </div>
   </div>
 </template>
 
 <script>
   import { aesEncrypt } from '@/utils/ase'
-  import { socialLogin, mobileLogin } from '@/api/user'
+  import { socialLogin, mobileLogin, bindingAccount } from '@/api/user'
   import { reqMobileGet } from '@/api/captcha'
   import { isPassword, isPhone } from '@/utils/validate'
   import { openWindow } from '@/utils/open-window'
   import Verify from '@/components/verifition/Verify'
+  import { checkBindMobile } from '@/api/user'
+  import AfterBind from '@/components/AfterBind'
+  import Vue from 'vue'
   export default {
     name: 'Login',
     components: {
       Verify,
+      AfterBind,
     },
     data() {
       const validateusername = (rule, value, callback) => {
@@ -297,6 +231,7 @@
         title: this.$baseTitle,
         isGetphone: false,
         phoneCode: '获取验证码',
+        centerDialogVisible: false,
         accountLoginForm: {
           username: '18627985217',
           password: '111111',
@@ -324,6 +259,7 @@
           token: '',
           secretKey: '',
         },
+        socialData: { accessToken: '', message: '' },
         phoneLoginRules: {
           phone: [
             { required: true, trigger: 'blur', message: '请输入手机号码' },
@@ -502,21 +438,38 @@
           }
         )
       },
-      afterSocialLogin(data) {
-        this.$store
-          .dispatch('user/loginSocial', data.data)
-          .then(() => {
-            const routerPath =
-              this.redirect === '/404' || this.redirect === '/401'
-                ? '/'
-                : this.redirect
-            this.$router.push(routerPath).catch(() => {})
-            this.loading = false
-          })
-          .catch(() => {
-            this.loading = false
-          })
+      afterBindingAccount(data) {
+        bindingAccount(data, this.socialData.accessToken).then(() => {
+          this.loginSocial()
+        })
         window.removeEventListener('message', this.afterSocialLogin, false)
+      },
+      afterSocialLogin(data) {
+        const { accessToken, message } = data.data
+        this.socialData.accessToken = accessToken
+        this.socialData.message = message
+        if (accessToken) {
+          checkBindMobile(accessToken).then((response) => {
+            console.log(response)
+            if (response.data === true) {
+              this.loginSocial()
+            } else {
+              this.centerDialogVisible = true
+            }
+          })
+        } else {
+          Vue.prototype.$baseMessage(message, 'error')
+        }
+        window.removeEventListener('message', this.afterSocialLogin, false)
+      },
+      loginSocial() {
+        this.$store.dispatch('user/loginSocial', this.socialData).then(() => {
+          const routerPath =
+            this.redirect === '/404' || this.redirect === '/401'
+              ? '/'
+              : this.redirect
+          this.$router.push(routerPath).catch(() => {})
+        })
       },
     },
   }

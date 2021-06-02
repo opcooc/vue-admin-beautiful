@@ -3,6 +3,7 @@ import { Base64 } from 'js-base64'
 import { encryptedData } from '@/utils/encrypt'
 import { clientId, clientSecret } from '@/config/settings'
 import { loginRSA, tokenName } from '@/config/settings'
+import store from '@/store'
 
 export async function login(data) {
   // if (loginRSA) {
@@ -54,13 +55,33 @@ export function getUserInfo() {
   })
 }
 
-export function updateAccount(data) {
+export function bindingAccount(data, accessToken) {
   return request({
-    url: '/admin/auth/update-account',
+    url: '/admin/auth/binding-account',
     method: 'get',
     params: {
       account: data.account,
       source: data.source,
+    },
+    headers: {
+      Authorization: 'Bearer ' + accessToken,
+    },
+  })
+}
+
+export function getSocialBind() {
+  return request({
+    url: '/admin/auth/social/bind',
+    method: 'get',
+  })
+}
+
+export function checkBindMobile(accessToken) {
+  return request({
+    url: '/user/check-bind-mobile',
+    method: 'get',
+    headers: {
+      Authorization: 'Bearer ' + accessToken,
     },
   })
 }

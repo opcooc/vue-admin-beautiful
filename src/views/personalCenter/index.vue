@@ -96,6 +96,46 @@
         </el-tab-pane>
         <el-tab-pane name="social" label="第三方帐号绑定">
           <h3 class="main-title">第三方帐号绑定</h3>
+          <el-table :data="socialData" style="width: 100%">
+            <el-table-column prop="tag" label="类型" width="100">
+              <template slot-scope="scope">
+                <vab-colorful-icon
+                  style="font-size: 26px"
+                  :icon-class="scope.row.icon"
+                />
+                <span style="margin-left: 10px">{{ scope.row.name }}</span>
+              </template>
+            </el-table-column>
+            <el-table-column prop="tag" label="状态" width="100">
+              <template slot-scope="scope">
+                <el-tag
+                  :type="scope.row.status === '未绑定' ? 'primary' : 'success'"
+                  disable-transitions
+                >
+                  {{ scope.row.status }}
+                </el-tag>
+              </template>
+            </el-table-column>
+            <el-table-column label="操作">
+              <template slot-scope="scope">
+                <el-button
+                  v-if="scope.row.status === '未绑定'"
+                  size="mini"
+                  @click="handleSocialEdit(scope.$index, scope.row)"
+                >
+                  绑定
+                </el-button>
+                <el-button
+                  v-if="scope.row.status === '已绑定'"
+                  size="mini"
+                  type="danger"
+                  @click="handleSocialDelete(scope.$index, scope.row)"
+                >
+                  解绑
+                </el-button>
+              </template>
+            </el-table-column>
+          </el-table>
         </el-tab-pane>
       </el-tabs>
       <el-dialog
@@ -168,7 +208,12 @@
 </template>
 
 <script>
-  import { getUserDetails, simpleUpdateUser, updateAccount } from '@/api/user'
+  import {
+    getUserDetails,
+    simpleUpdateUser,
+    bindingAccount,
+    getSocialBind,
+  } from '@/api/user'
   import { mapGetters } from 'vuex'
   import { aesEncrypt } from '@/utils/ase'
   import MobileVerify from '@/components/MobileVerify'
@@ -188,7 +233,7 @@
         }
       }
       return {
-        tabName: 'information',
+        tabName: 'social',
         tabPosition: 'left',
         labelPosition: 'right',
         centerDialogVisible: false,
@@ -205,6 +250,30 @@
         captchaType: 'slider',
         stepActive: 1,
         dialogTitle: '',
+        socialData: [],
+        socialSpecData: [
+          {
+            source: 'wechat',
+            icon: 'wechat',
+            name: '微信',
+            status: '未绑定',
+            providerId: '',
+          },
+          {
+            source: 'qq',
+            icon: 'qq',
+            name: 'QQ',
+            status: '未绑定',
+            providerId: '',
+          },
+          {
+            source: 'weibo',
+            icon: 'weibo',
+            name: '微博',
+            status: '未绑定',
+            providerId: '',
+          },
+        ],
         userInfoForm: {
           username: '',
           nickname: '',
@@ -252,8 +321,28 @@
     },
     created() {
       this.getUserInfo()
+      this.getSocialBindInfo()
     },
     methods: {
+      getSocialBindInfo() {
+        getSocialBind().then((response) => {
+          this.socialSpecData.map((item) => {
+            const data = item
+            const providerId = response.data[item.source]
+            if (providerId) {
+              data.status = '已绑定'
+              data.providerId = providerId
+            }
+            this.socialData.push(data)
+          })
+        })
+      },
+      handleSocialEdit(index, row) {
+        console.log(index, row)
+      },
+      handleSocialDelete(index, row) {
+        console.log(index, row)
+      },
       submitUserInfoForm(formName) {
         this.$refs[formName].validate((valid) => {
           if (valid) {
@@ -351,7 +440,7 @@
           captchaType: 'email',
         }
         console.log(data)
-        updateAccount(data).then((response) => {
+        bindingAccount(data).then((response) => {
           if (response.code === 901) {
             this.getUserInfo()
             this.centerDialogVisible = false
@@ -368,7 +457,7 @@
           captchaType: params.captchaType,
         }
         console.log(data)
-        updateAccount(data).then((response) => {
+        bindingAccount(data).then((response) => {
           if (response.code === 901) {
             this.getUserInfo()
             this.centerDialogVisible = false

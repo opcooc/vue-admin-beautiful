@@ -40,14 +40,12 @@
    * @description 分发验证码使用
    * */
   import VerifySlide from './Verify/VerifySlide'
-  import VerifySlide2 from './Verify/VerifySlide2'
   import VerifyPoints from './Verify/VerifyPoints'
 
   export default {
     name: 'Vue2Verify',
     components: {
       VerifySlide,
-      VerifySlide2,
       VerifyPoints,
     },
     props: {
@@ -90,8 +88,8 @@
         type: Object,
         default() {
           return {
-            width: '350px',
-            height: '213px',
+            width: '480px',
+            height: '240px',
           }
         },
       },
@@ -154,7 +152,7 @@
           switch (captchaType.toString()) {
             case 'slider':
               this.verifyType = '2'
-              this.componentType = 'VerifySlide2'
+              this.componentType = 'VerifySlide'
               break
             case 'click_word':
               this.verifyType = ''
@@ -193,10 +191,10 @@
       },
       closeBox() {
         this.clickShow = false
-        this.refresh()
       },
       show() {
         if (this.mode === 'pop') {
+          this.refresh()
           this.clickShow = true
         }
       },
@@ -289,9 +287,6 @@
     width: 100%;
     height: 100%;
     line-height: 30px;
-    white-space: nowrap;
-    overflow: hidden;
-    padding-left: 20px;
     color: #88949d;
   }
   /*验证码过渡成功动画*/
@@ -307,12 +302,12 @@
   /*验证码过渡动画*/
   .slider-tip-enter,
   .slider-tip-leave-to {
-    bottom: -30px;
+    bottom: 0;
   }
   /*验证码过渡动画*/
   .slider-tip-enter-active,
   .slider-tip-leave-active {
-    transition: bottom 0.5s;
+    transition: bottom 0s;
   }
   /*滑动验证码滑块区域*/
   .verify-slider-area {

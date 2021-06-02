@@ -1,84 +1,74 @@
 <template>
-  <div style="position: relative">
+  <div>
     <div
-      v-if="type === '2'"
-      class="verify-img-out"
-      :style="{ height: parseInt(setSize.imgHeight) + vSpace + 'px' }"
+      class="verify-img-container"
+      :style="{ width: setSize.imgWidth, height: setSize.imgHeight }"
     >
+      <img
+        class="verify-slider-bg"
+        :src="'data:image/png;base64,' + backImgBase"
+        alt=""
+        :style="{
+          width: setSize.imgWidth,
+          height: setSize.imgHeight,
+        }"
+      />
+      <img
+        class="verify-slider-front"
+        :src="'data:image/png;base64,' + blockBackImgBase"
+        alt=""
+        :style="{
+          left: moveBlockLeft,
+        }"
+      />
       <div
-        class="verify-img-panel"
-        :style="{ width: setSize.imgWidth, height: setSize.imgHeight }"
-      >
-        <img
-          :src="'data:image/png;base64,' + backImgBase"
-          alt=""
-          style="width: 100%; height: 100%; display: block"
-        />
-        <div v-show="showRefresh" class="verify-refresh" @click="refresh">
-          <vab-colorful-icon :icon-class="'refresh'" />
-        </div>
-        <transition name="tips">
-          <span
-            v-if="tipWords"
-            class="verify-tips"
-            :class="passFlag ? 'success-bg' : 'error-bg'"
-          >
-            {{ tipWords }}
-          </span>
-        </transition>
-      </div>
+        v-show="showRefresh"
+        class="verify-refresh"
+        :style="{ transform: 'rotate(' + refreshNumber * 90 + 'deg)' }"
+        @click="refresh"
+      ></div>
     </div>
-    <!-- 公共部分 -->
     <div
-      class="verify-bar-area"
+      class="verify-slider-area"
       :style="{
         width: setSize.imgWidth,
         height: barSize.height,
         'line-height': barSize.height,
       }"
     >
-      <span class="verify-msg" v-text="text"></span>
+      <transition name="slider-tip">
+        <span
+          v-if="tipWords"
+          class="verify-tips"
+          :class="passFlag ? 'success-bg' : 'error-bg'"
+        >
+          {{ tipWords }}
+        </span>
+      </transition>
+      <div class="verify-msg" :style="{ 'padding-left': blockSize.width }">
+        {{ text }}
+      </div>
       <div
-        class="verify-left-bar"
+        class="verify-slider-left-bar"
         :style="{
-          width: leftBarWidth !== undefined ? leftBarWidth : barSize.height,
-          height: barSize.height,
-          'border-color': leftBarBorderColor,
+          width: leftBarWidth !== undefined ? leftBarWidth : blockSize.width,
+          height: blockSize.height,
           transaction: transitionWidth,
+          'border-color': leftBarBorderColor,
         }"
       >
         <div
           class="verify-move-block"
           :style="{
-            width: barSize.height,
-            height: barSize.height,
-            'background-color': moveBlockBackgroundColor,
+            width: blockSize.width,
+            height: blockSize.height,
             left: moveBlockLeft,
             transition: transitionLeft,
           }"
           @touchstart="start"
           @mousedown="start"
         >
-          <vab-colorful-icon
-            :icon-class="iconClass"
-            :class-name="'slider-icon-class'"
-          />
-          <div
-            v-if="type === '2'"
-            class="verify-sub-block"
-            :style="{
-              width: Math.floor((parseInt(setSize.imgWidth) * 89) / 350) + 'px',
-              height: setSize.imgHeight,
-              top: '-' + (parseInt(setSize.imgHeight) + vSpace) + 'px',
-              'background-size': setSize.imgWidth + ' ' + setSize.imgHeight,
-            }"
-          >
-            <img
-              :src="'data:image/png;base64,' + blockBackImgBase"
-              alt=""
-              style="width: 100%; height: 100%; display: block"
-            />
-          </div>
+          <span class="verify-slider-left-bar-sign">> ></span>
         </div>
       </div>
     </div>
@@ -93,13 +83,12 @@
   import { resetSize } from './../utils/util'
   import { reqGet, reqCheck } from '@/api/captcha'
 
-  //  "captchaType":"blockPuzzle",
   export default {
     name: 'VerifySlide',
     props: {
-      // eslint-disable-next-line vue/require-default-prop
       captchaType: {
         type: String,
+        required: true,
       },
       type: {
         type: String,
@@ -108,42 +97,31 @@
       //弹出式pop，固定fixed
       mode: {
         type: String,
-        default: 'fixed',
+        required: true,
       },
       vSpace: {
         type: Number,
-        default: 8,
+        required: true,
       },
       explain: {
         type: String,
-        default: '向右滑动完成验证',
+        required: true,
+      },
+      originalSize: {
+        type: Object,
+        required: true,
       },
       imgSize: {
         type: Object,
-        default() {
-          return {
-            width: '350px',
-            height: '213px',
-          }
-        },
+        required: true,
       },
       blockSize: {
         type: Object,
-        default() {
-          return {
-            width: '89px',
-            height: '89px',
-          }
-        },
+        required: true,
       },
       barSize: {
         type: Object,
-        default() {
-          return {
-            width: '350px',
-            height: '40px',
-          }
-        },
+        required: true,
       },
     },
     data() {
@@ -159,6 +137,7 @@
         slideY: '',
         tipWords: '',
         text: '',
+        refreshNumber: 1,
         setSize: {
           imgHeight: 0,
           imgWidth: 0,
@@ -170,10 +149,7 @@
         moveBlockLeft: undefined,
         leftBarWidth: undefined,
         // 移动中样式
-        moveBlockBackgroundColor: undefined,
         leftBarBorderColor: '#ddd',
-        iconColor: undefined,
-        iconClass: 'right',
         status: false, //鼠标状态
         isEnd: false, //是够验证完成
         showRefresh: true,
@@ -183,7 +159,7 @@
     },
     computed: {
       barArea() {
-        return this.$el.querySelector('.verify-bar-area')
+        return this.$el.querySelector('.verify-slider-area')
       },
       resetSize() {
         return resetSize
@@ -207,7 +183,6 @@
     methods: {
       init() {
         this.text = this.explain
-        this.getPictrue()
         this.$nextTick(() => {
           let setSize = this.resetSize(this) //重新设置宽度高度
           for (let key in setSize) {
@@ -265,9 +240,7 @@
         this.startMoveTime = +new Date() //开始滑动的时间
         if (this.isEnd === false) {
           this.text = ''
-          this.moveBlockBackgroundColor = '#337ab7'
           this.leftBarBorderColor = '#337AB7'
-          this.iconColor = '#fff'
           e.stopPropagation()
           this.status = true
         }
@@ -283,25 +256,19 @@
             //兼容移动端
             var x = e.touches[0].pageX
           }
-          var bar_area_left = this.barArea.getBoundingClientRect().left
-          var move_block_left = x - bar_area_left //小方块相对于父元素的left值
-          if (
-            move_block_left >=
-            this.barArea.offsetWidth -
-              parseInt(parseInt(this.blockSize.width) / 2) -
-              2
-          ) {
-            move_block_left =
-              this.barArea.offsetWidth -
-              parseInt(parseInt(this.blockSize.width) / 2) -
-              2
+          let bar_area_left = this.barArea.getBoundingClientRect().left
+          let move_block_left = x - bar_area_left - this.startLeft //小方块相对于父元素的left值
+          let maxWidth =
+            this.barArea.offsetWidth - parseInt(this.blockSize.width) - 2
+          if (move_block_left >= maxWidth) {
+            move_block_left = maxWidth
           }
           if (move_block_left <= 0) {
-            move_block_left = parseInt(parseInt(this.blockSize.width) / 2)
+            move_block_left = 0
           }
           //拖动后小方块的left值
-          this.moveBlockLeft = move_block_left - this.startLeft + 'px'
-          this.leftBarWidth = move_block_left - this.startLeft + 'px'
+          this.moveBlockLeft = move_block_left + 'px'
+          this.leftBarWidth = move_block_left + 'px'
         }
       },
 
@@ -315,7 +282,8 @@
             (this.moveBlockLeft || '').replace('px', '')
           )
           moveLeftDistance =
-            (moveLeftDistance * 350) / parseInt(this.setSize.imgWidth)
+            (moveLeftDistance * parseInt(this.originalSize.width)) /
+            parseInt(this.setSize.imgWidth)
           let data = {
             captchaType: this.captchaType,
             data: this.secretKey
@@ -328,10 +296,7 @@
           }
           reqCheck(data).then((res) => {
             if (res.code === 901) {
-              this.moveBlockBackgroundColor = '#5cb85c'
               this.leftBarBorderColor = '#5cb85c'
-              this.iconColor = '#fff'
-              this.iconClass = 'check'
               this.showRefresh = false
               this.isEnd = true
               if (this.mode === 'pop') {
@@ -361,10 +326,7 @@
                 this.$parent.$emit('success', res.data)
               }, 1000)
             } else {
-              this.moveBlockBackgroundColor = '#d9534f'
               this.leftBarBorderColor = '#d9534f'
-              this.iconColor = '#fff'
-              this.iconClass = 'close'
               this.passFlag = false
               setTimeout(function () {
                 _this.refresh()
@@ -382,7 +344,7 @@
 
       refresh: function () {
         this.showRefresh = true
-
+        this.refreshNumber = this.refreshNumber + 1
         this.transitionLeft = 'left .3s'
         this.moveBlockLeft = 0
 
@@ -390,9 +352,6 @@
         this.transitionWidth = 'width .3s'
 
         this.leftBarBorderColor = '#ddd'
-        this.moveBlockBackgroundColor = '#fff'
-        this.iconColor = '#000'
-        this.iconClass = 'right'
         this.isEnd = false
 
         this.getPictrue()
